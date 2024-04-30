@@ -1,0 +1,38 @@
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+:root {
+    /* color-scheme: light dark; */
+    margin: 0 auto;
+    max-width: 1280px;
+    font-synthesis: none;
+    text-align: center;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+    font-family: system-ui;
+    font-size: 1.125rem;
+    line-height: 1.5;
+    display: flex;
+    place-items: center;
+    min-width: 320px;
+    min-height: 100vh;
+}
+
+img,
+svg,
+video {
+    max-width: 100%;
+    display: block;
+}
+
+input,
+textarea {
+    min-width: 0;
+}
