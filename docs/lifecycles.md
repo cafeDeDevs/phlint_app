@@ -51,3 +51,31 @@ journey
       Server Sends Encrypted Image to S3 Bucket: 3: Server, S3
 </pre>
 </div>
+
+**Request Image**
+
+NOTE: This diagram illustrates an initial implementation where the image is
+decrypted on the <em>server</em>. Should performance become an issue, this
+implementation will need to be rethought using Web Assembly, where decryption
+will occur on the <em>client</em>.
+
+<div align="center">
+<pre class="mermaid">
+journey
+    title Request Image (happy path)
+    section User Requests Image
+      Clicks On "View Image" Button: 3: Client
+      Client Sends Permissions Credentials (JWT): 3: Client
+    section Server Procceses Request
+      Server Checks Client's Credentials against PostgreSQL DB: 3: Server, DB
+      Server Receives S3 bucket address of encrypted image: Server, DB, S3
+      S3 Sends Encrypted Image to Server: 3: S3, Server
+      Server Decrypts Image Using AES script: Server
+      Server Sends Raw Image to Client: Server, Client
+    section Server Proccesses Image
+      Server Uses AES Script to Encrypt Image: 3: Server
+      Raw Image Is Cached For User To View Immediately: 3: Server, Cache
+    section Client Receives Raw Image
+      Client Views Raw Image: 3: Client
+</pre>
+</div>
