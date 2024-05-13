@@ -45,32 +45,3 @@ Network Table is <em>not</em> checked.
     NETWORKS }o -- |{ ALBUMS: accesses
 </pre>
 </div>
-
-**SignUp**
-
-Signing Up is usually initialized by invitation from one of our existing Users.
-Upon invitation, the Potential User is Onboarded through
-a standard Invitation Email and Sign Up Process. It is expected that the User
-who Invited the Potential User has done so in order to grant them access to a
-particular Album via a Network. This process is also reflective of how one
-User of the Application can invite another User to join a Network and view
-said Network's Album (maybe minus the email verification part?).
-
-<div align="center">
-<pre class="mermaid">
-journey
-    title SignUp/Join (happy path)
-    section Invite John
-      Clicks On "Invite" Button: 4: Me
-    section Request Network
-      Send Invitation Email: 3: Application
-      Accept Invitation: 4: John
-    section SignUp
-      Redirect Back to App: 3: Application
-      Sign Up For App: 4: John, Application
-    section Join First Network
-      Sign Up John For App: 3: Application
-      Join John To My Network: 3: Application
-      Redirect John To My Album: 5: Me, John
-</pre>
-</div>
