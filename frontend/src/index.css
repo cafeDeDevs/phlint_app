@@ -25,6 +25,13 @@ body {
     min-height: 100vh;
 }
 
+/* TODO: Remove this when actually styling app */
+body > * {
+    justify-items: center;
+    align-items: center;
+    margin: 0 auto;
+}
+
 img,
 svg,
 video {

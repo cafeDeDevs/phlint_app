@@ -1,0 +1,3 @@
+VITE_GOOGLE_OAUTH2_CLIENT_ID=
+VITE_BACKEND_REGISTRATION_ROUTE=http://localhost:8000/api/register-by-access-token/social/google-oauth2/
+VITE_BACKEND_TEST_ROUTE=http://localhost:8000/api/authentication-test/
