@@ -129,4 +129,59 @@ Lead will let you know if a branch still needs work before being pulled into the
 
 ## Creating A Pull Request
 
-Testing Workflow
+Once you have completed your Ticket, or simply wish to push your commits up to
+the Github remote, you'll first need to set the upstream remote, `origin`, so
+that a remote branch is created to mirror the local branch you created:
+
+```sh
+git push --set-upstream origin 001_add_signup_to_auth_tomit4
+```
+
+You'll then be instructed to `Create a pull request` on Github, by visiting a
+url:
+
+```
+https://github.com/cafeDeDevs/phlint_app/pull/new/001_add_signup_to_auth_tomit4
+```
+
+Visit this page, where you'll be presented with a Pull Request template:
+
+<img src="./assets/contributing_001.png" />
+
+Of importance is the header above the title, which shows which branch you wish
+to merge your devlopment branch with. Usually this is the `main` branch when you
+wish to push your changes to production. Should there be any conflicts within
+the merge, you will be notified in this section.
+
+Within the title section, include the ticket number, as well as the ticket subject/issue
+and/or bug fix. Within the description field, include a short description of
+what this Ticket resolves or adds to the Phlint App Project. A short, bullet
+point list is encouraged if the Ticket is particularly in depth or complex.
+Lastly, before you click on the Green <em>Create pull request</em> button, make
+sure to click the <em>Gear Icon next to the Assignees</em> field, you'll see a
+drop down list of fellow Contributors presented to you. Most of the time, you'll
+want to Assign the Pull Request to the Project Lead, in this case, that'd be me,
+`tomit4`.
+
+Here is a screenshot of what a filled out Pull Request Form might look like:
+
+<img src="./assets/contributing_002.png" />
+
+Upon submitting the Pull Request, you'll notice a warning showing that a
+<em>Review Is Required</em>. This is because the Project Lead has protected
+the `main` branch, requiring that the Pull Request be reviewed and approved
+prior to merging into the main branch. Should the you and/or the other
+contributors wish to comment on the Pull Request prior to the Pull Request being
+approved, you can see comments by visiting the Phlint App's [Github
+Repository](https://github.com/cafeDeDevs/phlint_app) and visit the Pull Request
+Tab towards the top.
+
+Should any changes to your code be requested prior to the Pull Request being
+approved, you can simply continue to work on the code base on your local
+development branch, add, commit, and push the code as per usual. Once the
+requested changes have been made, there is no need to make another Pull Request,
+simply make another comment on the Pull Request letting the others on your team
+that the changes have been made. Should your changes be approved, you'll see
+that this Pull Request is approved, merged into the `main` branch, and resolved.
+
+### Clean Up
