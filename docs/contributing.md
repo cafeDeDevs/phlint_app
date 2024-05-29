@@ -185,3 +185,43 @@ that the changes have been made. Should your changes be approved, you'll see
 that this Pull Request is approved, merged into the `main` branch, and resolved.
 
 ### Clean Up
+
+Once finished, you'll want to keep things tidy by deleting the branch <em>both
+locally and remotely</em>. To delete the branch remotely, invoke the following
+command:
+
+```sh
+git push -d origin <branch_name>
+```
+
+In the case of the aforementioned example, this would look like this:
+
+```sh
+git push -d origin 001_add_signup_to_auth_tomit4
+```
+
+You'll then want to remove the local branch on your development machine as well
+like so:
+
+```sh
+git branch -d <branch_name>
+```
+
+Which, given our previous example, would look like this:
+
+```sh
+git branch -d 001_add_signup_to_auth_tomit4
+```
+
+### Conclusion
+
+There is a lot this document doesn't cover when it comes to basic workflows
+using Git and Github, but it is provided here so that you have a basic
+understanding of a conventional workflow that we hope you will implement when
+contributing to the Phlint App.
+
+Thank you for taking the time to learn our best practices and conventions.
+Should you have any questions or need help with a Pull Request, make sure to
+reach out to the [Project Lead](https://github.com/tomit4).
+
+Thank you for contributing to Phlint App!
