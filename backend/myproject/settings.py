@@ -47,7 +47,6 @@ INSTALLED_APPS = [
     'corsheaders',
     'social_django',
     'users.apps.UsersConfig',
-    'django_extensions',
 ]
 
 MIDDLEWARE = [
@@ -160,9 +159,10 @@ AUTHENTICATION_BACKENDS = [
 
 # Social Auth Settings
 
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.getenv('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY')
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.getenv(
+    'SOCIAL_AUTH_GOOGLE_OAUTH2_CLIENT_ID')
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.getenv(
-    'SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET')
+    'SOCIAL_AUTH_GOOGLE_OAUTH2_CLIENT_SECRET')
 SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI = os.getenv(
     'SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI')
 
@@ -192,7 +192,6 @@ CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',
-    'https://localhost:5173',
 ]
 
 # CSRF Cookie Settings
@@ -202,5 +201,4 @@ CSRF_COOKIE_NAME = 'csrftoken'
 
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:5173',
-    'https://localhost:5173',
 ]

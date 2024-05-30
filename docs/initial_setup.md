@@ -62,10 +62,12 @@ Once you have said credentials, fill in the corresponding fields, specifically
 the following fields:
 
 ```.env
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY=""
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET=""
-SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI =""
+SOCIAL_AUTH_GOOGLE_OAUTH2_CLIENT_ID=""
+SOCIAL_AUTH_GOOGLE_OAUTH2_CLIENT_SECRET=""
+SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI=""
 ```
+
+To be clear, these values should correspond directly to the `client_id`, `client_secret`, and the sole value within the array at the `redirect_uris` field you received from the Project Lead within the `client_secrets.json` file.
 
 Spin Up PostgreSQL in Docker
 
@@ -139,25 +141,6 @@ And Exit the Docker Container:
 exit
 ```
 
-### Generating Local SSL Certs
-
-This project's development environment utilizes locally generated SSL
-certificates to most closely mimic production level authentication strategies.
-
-You'll need to utilize the [mkcert](https://github.com/FiloSottile/mkcert)
-package to generate the necessary `cert.pem` and `key.pem` files. You can do
-this from the command line by invoking the following from within the project's
-`backend` directory:
-
-```sh
-mkcert -cert-file cert.pem -key-file key.pem localhost 127.0.0.1 && \
-mkcert -install
-```
-
-This will generate local SSL certificates that can be used on localhost, and
-also install them into your browser's SSL registry so that they will be
-recognized.
-
 ### Starting The Backend Server
 
 For your convenience, the backend directory has a simple script called `start`,
@@ -197,9 +180,9 @@ the following fields:
 VITE_GOOGLE_OAUTH2_CLIENT_ID=
 ```
 
-Note that this is the same client_id provided for the backend, so if you already
-have set up those credentials, simply put the same client_id string from the
-backend here in the frontend.A
+Note that this is the same `client_id` provided for the backend (i.e. the `client_id` field within the `client_secrets.json` file you received from the Project Lead), so if you already
+have set up those credentials, simply put the same `client_id` string from the
+backend here in the frontend.
 
 Starting the Frontend Server
 
@@ -210,24 +193,12 @@ server:
 npm run dev
 ```
 
-This should start up the development server, note that this development server
-also uses a local `https` server instead of `http`, but due to the use of a
-package called `@vitejs/plugin-basic-ssl`, we don't have to do nearly as much
-work to get `ssl` working here.
-
+And now you simply have to visit the project via your browser via `localhost`.
 In your browser, enter the following URL:
 
 ```
-https://localhost:5173
+http://localhost:5173
 ```
-
-Note that during the backend installation/setup process we generated local `SSL`
-certs and then provided them to our browser's recognized SSL registry using
-`mkcert -install`. The browser will still warn you that the page you are
-visiting is not private, but because we are solely working within a development
-environment on our local machine, we will forego these warnings by clicking on
-the <em>Advanced</em> key, and then twice clicking on the <em>Proceed to
-localhost(unsafe)</em> link (or <em>Accept Risk And Continue</em> if using firefox).
 
 ### What To Do If Something Goes Wrong
 
