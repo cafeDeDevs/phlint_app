@@ -202,3 +202,43 @@ CSRF_COOKIE_NAME = 'csrftoken'
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:5173',
 ]
+
+# Logging Settings
+
+os.makedirs('logs', exist_ok=True)
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler"
+        },
+        "general": {
+            "level": os.environ.get("DJANGO_LOG_LEVEL", "INFO"),
+            "class": "logging.FileHandler",
+            "filename": "./logs/general.log.json",
+            "formatter": "json",
+        },
+    },
+    "loggers": {
+        "django": {
+            "level": os.environ.get("DJANGO_LOG_LEVEL", "ERROR"),
+            "handlers": ["console"],
+            "propogate": False,
+        },
+        "": {
+            "handlers": ["general"],
+            "level": os.environ.get("DJANGO_LOG_LEVEL", "INFO"),
+        }
+    },
+    "formatters": {
+        "verbose": {
+            "format":
+            "{asctime} ({levelname})- {name}- {module}- {process:d}- {thread:d}- {message}",
+            "style": "{",
+        },
+        "json": {
+            "()": "myproject.logs.JSONFormatter",
+        },
+    },
+}

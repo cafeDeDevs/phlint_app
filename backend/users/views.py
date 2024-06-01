@@ -1,4 +1,5 @@
 import requests
+import logging
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view, permission_classes
@@ -16,6 +17,9 @@ from requests.exceptions import HTTPError
 
 from users.models import User
 from users.serializers import UserSerializer
+
+# TODO: Add note of logger in a best_practices.md doc
+logger = logging.getLogger(__name__)
 
 
 # NOTE: Helper function for setting cookies (consider moving into separate file/Class)
@@ -51,6 +55,7 @@ def set_authentication_cookies(response, access_token, refresh_token, request):
 def register_by_access_token(request, backend):
     code = request.data.get('code')
     if not code:
+        logger.warning("Request does not have OAuth code")
         return Response({'error': 'No OAuth code provided.'},
                         status=status.HTTP_400_BAD_REQUEST)
     try:
@@ -97,6 +102,9 @@ def register_by_access_token(request, backend):
                         'Sign Up Failed. User Already Exists. Please Login.'
                     },
                     status=status.HTTP_409_CONFLICT)
+                logger.warning(
+                    "%s attempted to sign up, but already has account",
+                    user.email)
                 return res
             if serializer.is_valid():
                 serializer.save()
@@ -111,13 +119,17 @@ def register_by_access_token(request, backend):
             )
             res = set_authentication_cookies(res, token.key, refresh_token,
                                              request)
+
+            logger.info("%s successful signed up", user.email)
             return res
         else:
+            logger.warning("python social auth unable to authenticate user")
             return Response(
                 {'error': 'User Not Found By OAuth Code'},
                 status=status.HTTP_400_BAD_REQUEST,
             )
     except Exception as e:
+        logger.error("%s Uncaught Exception Error:", str(e))
         return Response({'error': str(e)},
                         status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -126,11 +138,13 @@ def register_by_access_token(request, backend):
 @api_view(['POST'])
 @csrf_protect
 def authentication_test(request):
-    #  print(request.user)
     if isinstance(request.user, AnonymousUser):
+        logger.warning("User attempted to login as AnonymousUser")
         return Response(
             {"error": "Access forbidden. You are not authenticated."},
             status=status.HTTP_401_UNAUTHORIZED)
+
+    logger.info("%s successful authenticated", request.user)
     return Response(
         {'message': "User successfully authenticated"},
         status=status.HTTP_200_OK,
