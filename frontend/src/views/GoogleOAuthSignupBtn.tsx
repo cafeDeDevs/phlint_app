@@ -1,7 +1,11 @@
 import { useGoogleLogin } from '@react-oauth/google'
 import { useNavigate } from 'react-router-dom'
 
-const GoogleOAuthSignInBtn = () => {
+// TODO: Add An Onboarding Process that
+// asks the user to create a user_name
+// TODO: Display message on All Error Responses
+// (especially on 409 Conflict, user already exists, redirect to login)
+const GoogleOAuthSignupBtn = () => {
     const navigate = useNavigate()
     const login = useGoogleLogin({
         onSuccess: async (tokenResponse): Promise<void> => {
@@ -34,7 +38,7 @@ const GoogleOAuthSignInBtn = () => {
         flow: 'auth-code',
     })
 
-    return <button onClick={() => login()}>Sign In With Google</button>
+    return <button onClick={() => login()}>Sign Up With Google</button>
 }
 
-export default GoogleOAuthSignInBtn
+export default GoogleOAuthSignupBtn

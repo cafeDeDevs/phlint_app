@@ -1,17 +1,17 @@
 import { GoogleOAuthProvider } from '@react-oauth/google'
-import GoogleOAuthLoginBtn from './GoogleOAuthLoginBtn'
+import GoogleOAuthSignupBtn from './GoogleOAuthSignupBtn'
 const googleClientId = import.meta.env.VITE_GOOGLE_OAUTH2_CLIENT_ID
 
 // TODO: Set up where if the User is
 // already logged in they are taken to AuthPage
-const Login = () => {
+const Signup = () => {
     return (
         <>
             <GoogleOAuthProvider clientId={googleClientId}>
-                <GoogleOAuthLoginBtn />
+                <GoogleOAuthSignupBtn />
             </GoogleOAuthProvider>
         </>
     )
 }
 
-export default Login
+export default Signup

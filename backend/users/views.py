@@ -8,10 +8,14 @@ from rest_framework.response import Response
 from django.conf import settings
 from django.middleware.csrf import get_token
 from django.contrib.auth.models import AnonymousUser
+from django.contrib.auth import login
 from django.views.decorators.csrf import csrf_protect
 
 from social_django.utils import psa
 from requests.exceptions import HTTPError
+
+from users.models import User
+from users.serializers import UserSerializer
 
 
 # NOTE: Helper function for setting cookies (consider moving into separate file/Class)
@@ -39,6 +43,8 @@ def set_authentication_cookies(response, access_token, refresh_token, request):
 
 # NOTE: Currently somewhat of a hack using python's native requests lib,
 # there is probably a better way using the social_auth.core
+# TODO: This route's logic is getting too long,
+# refactor into smaller helper functions
 @api_view(['POST'])
 @permission_classes([AllowAny])
 @psa()
@@ -73,10 +79,32 @@ def register_by_access_token(request, backend):
         user = request.backend.do_auth(access_token)
 
         if user:
-            # TODO: Use the user.email to sign up/set user as logged in
-            #  print('user.email :=>', user.email)
+            # NOTE: Temporary demonstration of "sign up" logic,
+            # Uses Django REST framework serializers to save user to DB
+            # TODO: We Need an Onboarding Process that establishes
+            # the user_name (user chooses username)
+            user_data = {
+                'user_name': user.email,
+                'user_email': user.email,
+            }
+
+            serializer = UserSerializer(data=user_data)
+            existing_user = serializer.get_user_by_email(data=user_data)
+            if existing_user is not None:
+                res = Response(
+                    {
+                        'msg':
+                        'Sign Up Failed. User Already Exists. Please Login.'
+                    },
+                    status=status.HTTP_409_CONFLICT)
+                return res
+            if serializer.is_valid():
+                serializer.save()
 
             token, _ = Token.objects.get_or_create(user=user)
+            # NOTE: Sets sessionid cookie, is necessary??
+            # TODO: Investigate Django login() method more
+            login(request, user)
             res = Response(
                 {'msg': 'User Authenticated, setting credentials'},
                 status=status.HTTP_200_OK,
