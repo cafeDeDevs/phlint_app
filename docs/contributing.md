@@ -172,14 +172,10 @@ Here is a screenshot of what a filled out Pull Request Form might look like:
 
 <img src="./assets/contributing_002.png" />
 
-Upon submitting the Pull Request, you'll notice a warning showing that a
-<em>Review Is Required</em>. This is because the Project Lead has protected
-the `main` branch, requiring that the Pull Request be reviewed and approved
-prior to merging into the main branch. Should the you and/or the other
-contributors wish to comment on the Pull Request prior to the Pull Request being
-approved, you can see comments by visiting the Phlint App's [Github
-Repository](https://github.com/cafeDeDevs/phlint_app) and visit the Pull Request
-Tab towards the top.
+Should the you and/or the other contributors wish to comment on the Pull Request
+prior to the Pull Request being approved, you can see comments by visiting the
+Phlint App's [Github Repository](https://github.com/cafeDeDevs/phlint_app) and
+visit the Pull Request Tab towards the top.
 
 Should any changes to your code be requested prior to the Pull Request being
 approved, you can simply continue to work on the code base on your local
