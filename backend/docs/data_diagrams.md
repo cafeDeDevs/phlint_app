@@ -24,23 +24,23 @@ Network Table is <em>not</em> checked.
     ALBUMS ||--|{ PHOTOS : contains
     ALBUMS {
         int id PK
-        int userId FK
+        int user_id FK
         string title
-        string locationUrlOrDirectory
+        string s3_url
         bool isPrivate
     }
     PHOTOS {
         int id PK
-        int albumId FK
+        int album_id FK
         string date
-        string locationUrlOrDirectory
+        string s3_url
     }
     USER ||--o{ NETWORKS: has
     NETWORKS {
         int id PK
-        int founderId FK
-        int userId FK
-        int albumId FK
+        int founder_id FK
+        int user_id FK
+        int album_id FK
     }
     NETWORKS }o -- |{ ALBUMS: accesses
 </pre>
