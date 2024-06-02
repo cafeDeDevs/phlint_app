@@ -10,4 +10,8 @@ const grabStoredCookie = (cookieKey: string): string => {
     return cookieVal
 }
 
-export default grabStoredCookie
+const delay = (ms: number): Promise<void> => {
+    return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
+export { grabStoredCookie, delay }

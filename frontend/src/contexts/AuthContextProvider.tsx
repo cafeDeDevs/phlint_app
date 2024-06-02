@@ -2,7 +2,7 @@ import { useEffect, type ReactNode } from 'react'
 import { AuthContext } from './AuthContext'
 import { useNavigate } from 'react-router-dom'
 
-import grabStoredCookie from '../utils/'
+import { grabStoredCookie } from '../utils/'
 
 interface Props {
     children?: ReactNode
