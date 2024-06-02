@@ -150,8 +150,13 @@ Visit this page, where you'll be presented with a Pull Request template:
 
 Of importance is the header above the title, which shows which branch you wish
 to merge your devlopment branch with. Usually this is the `main` branch when you
-wish to push your changes to production. Should there be any conflicts within
-the merge, you will be notified in this section.
+wish to push your changes to production, <em>but you should change the button
+above that says <b>base:main</b> to read <b>base:dev</b></em>. This is because the Project
+Lead will pull `dev` into `main` once a certain amount of Tickets are resolved. To reiterate,
+<b>DO NOT CREATE A PULL REQUEST INTO MAIN, ALWAYS PULL REQUEST INTO DEV</b>, this is very important
+as it protects our `main` branch should anything break within `dev`.
+
+Should there be any conflicts within the merge, you will be notified in this section.
 
 Within the title section, include the ticket number, as well as the ticket subject/issue
 and/or bug fix. Within the description field, include a short description of
