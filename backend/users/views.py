@@ -50,7 +50,7 @@ def set_authentication_cookies(response, access_token, refresh_token, request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 @psa()
-def register_by_access_token(request):
+def register_by_access_token(request, backend):
     code = request.data.get('code')
     if not code:
         logger.warning("Request does not have OAuth code")
