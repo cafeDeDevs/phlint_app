@@ -16,3 +16,4 @@ env
 *.vim
 test.sh
 *.pem
+venv/
