@@ -33,10 +33,7 @@ const GoogleOAuthLoginBtn = () => {
             } catch (err) {
                 if (err instanceof Error) {
                     console.error('ERROR :=>', err.message)
-                    setErrorMsg(
-                        err.message ||
-                            'Error occured while authenticating. Please sign up.',
-                    )
+                    setErrorMsg(err.message)
                     await delay(3000)
                     navigate('/signup')
                 }
@@ -45,10 +42,7 @@ const GoogleOAuthLoginBtn = () => {
         onError: async (err) => {
             if (err instanceof Error) {
                 console.error('ERROR :=>', err.message)
-                setErrorMsg(
-                    err.message ||
-                        'Error occured while authenticating. Please sign up.',
-                )
+                setErrorMsg(err.message)
                 await delay(3000)
                 navigate('/signup')
             }
