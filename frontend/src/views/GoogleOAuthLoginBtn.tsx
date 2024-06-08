@@ -2,11 +2,8 @@ import { useGoogleLogin } from '@react-oauth/google'
 import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 
-const delay = (ms: number): Promise<void> => {
-    return new Promise((resolve) => setTimeout(resolve, ms))
-}
+import { delay } from '../utils/'
 
-// TODO: Display Error Messages (especially on 401 Unauthorized Response ,user unauthorized)
 const GoogleOAuthLoginBtn = () => {
     const navigate = useNavigate()
     const [errorMsg, setErrorMsg] = useState<string | null>(null)
@@ -30,27 +27,31 @@ const GoogleOAuthLoginBtn = () => {
                 )
 
                 if (!res.ok) {
-                    const errorData = await res.json()
+                    const jsonRes = await res.json()
+                    throw new Error(jsonRes.message)
+                } else navigate('/auth')
+            } catch (err) {
+                if (err instanceof Error) {
+                    console.error('ERROR :=>', err.message)
                     setErrorMsg(
-                        errorData.msg ||
-                            'Error while trying to authenticate user. Please sign up.',
+                        err.message ||
+                            'Error occured while authenticating. Please sign up.',
                     )
                     await delay(3000)
                     navigate('/signup')
-                } else {
-                    navigate('/auth')
                 }
-            } catch (err) {
-                console.error('ERROR :=>', err)
-                setErrorMsg('An unexpected error occurred. Please try again.')
+            }
+        },
+        onError: async (err) => {
+            if (err instanceof Error) {
+                console.error('ERROR :=>', err.message)
+                setErrorMsg(
+                    err.message ||
+                        'Error occured while authenticating. Please sign up.',
+                )
                 await delay(3000)
                 navigate('/signup')
             }
-        },
-        onError: (err) => {
-            console.error('ERROR :=>', err)
-            setErrorMsg('Login failed. Please sign up.')
-            delay(3000).then(() => navigate('/signup'))
         },
         flow: 'auth-code',
     })

@@ -97,7 +97,7 @@ def register_by_access_token(request, backend):
             if existing_user is not None:
                 res = Response(
                     {
-                        'msg':
+                        'message':
                         'Sign Up Failed. User Already Exists. Please Login.'
                     },
                     status=status.HTTP_409_CONFLICT)
@@ -113,7 +113,7 @@ def register_by_access_token(request, backend):
             # TODO: Investigate Django login() method more
             login(request, user)
             res = Response(
-                {'msg': 'User Authenticated, setting credentials'},
+                {'message': 'User Authenticated, setting credentials'},
                 status=status.HTTP_200_OK,
             )
             res = set_authentication_cookies(res, token.key, refresh_token,
@@ -133,11 +133,8 @@ def register_by_access_token(request, backend):
                         status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-
-
-
-# ! PAUL
-
+# TODO: This route's logic is getting too long,
+# refactor into smaller helper functions
 @api_view(['POST'])
 @permission_classes([AllowAny])
 @psa()
@@ -166,17 +163,10 @@ def login_by_access_token(request, backend):
 
         tokens = response.json()
         access_token = tokens.get('access_token')
-        # TODO: refresh_token should be set in key/value store (i.e. redis cache)
-        # and used to grab new access_token when access_token is expired
-        # TODO: refresh_token could not exist, handle exception, but don't return
         refresh_token = tokens.get('refresh_token')
         user = request.backend.do_auth(access_token)
 
         if user:
-            # NOTE: Temporary demonstration of "sign up" logic,
-            # Uses Django REST framework serializers to save user to DB
-            # TODO: We Need an Onboarding Process that establishes
-            # the user_name (user chooses username)
             user_data = {
                 'user_name': user.email,
                 'user_email': user.email,
@@ -185,55 +175,52 @@ def login_by_access_token(request, backend):
             serializer = UserSerializer(data=user_data)
             existing_user = serializer.get_user_by_email(  # type:ignore
                 data=user_data)
-            if existing_user is not None:
+            if existing_user is None:
                 res = Response(
                     {
-                        'msg':
-                        'Sign Up Failed. User Already Exists. Please Login.'
+                        'message':
+                        'Login Failed. User Does Not Exist. Please Sign Up.'
                     },
-                    status=status.HTTP_409_CONFLICT)
+                    status=status.HTTP_401_UNAUTHORIZED)
                 logger.warning(
-                    "%s attempted to sign up, but already has account",
+                    "%s attempted to login, but does not yet have an account",
                     user.email)
                 return res
-            if serializer.is_valid():
-                serializer.save()
 
             token, _ = Token.objects.get_or_create(user=user)  # type:ignore
-            # NOTE: Sets sessionid cookie, is necessary??
-            # TODO: Investigate Django login() method more
             login(request, user)
 
-            # ! PAUL 
             res = Response(
-                {'msg': 'User Logged In.'},
+                {'message': 'User Is Authenticated, Logging In...'},
                 status=status.HTTP_200_OK,
             )
             res = set_authentication_cookies(res, token.key, refresh_token,
                                              request)
 
-            logger.info("%s successful signed up", user.email)
+            logger.info("%s is successfully authenticated, loggging in...",
+                        user.email)
             return res
         else:
             logger.warning("python social auth unable to find user")
             return Response(
-                {'error': 'User Not Found in Database'},
+                {'message': 'User Not Found in Database'},
                 status=status.HTTP_401_UNAUTHORIZED,
             )
     except Exception as e:
         logger.error("%s Uncaught Exception Error:", str(e))
-        return Response({'error': str(e)},
+        return Response({'message': str(e)},
                         status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 # TODO: redirect to get new access_token if access_token is expired via refresh_token
+# TODO: Have this check the Users DB to see if they exist in the DB every time...
 @api_view(['POST'])
 @csrf_protect
 def authentication_test(request):
     if isinstance(request.user, AnonymousUser):
         logger.warning("User attempted to login as AnonymousUser")
         return Response(
-            {"error": "Access forbidden. You are not authenticated."},
+            {"message": "Access forbidden. You are not authenticated."},
             status=status.HTTP_401_UNAUTHORIZED)
 
     logger.info("%s successful authenticated", request.user)
