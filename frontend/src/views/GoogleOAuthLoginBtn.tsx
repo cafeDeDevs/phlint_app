@@ -29,7 +29,8 @@ const GoogleOAuthLoginBtn = () => {
                 if (!res.ok) {
                     const jsonRes = await res.json()
                     throw new Error(jsonRes.message)
-                } else navigate('/auth')
+                }
+                navigate('/auth')
             } catch (err) {
                 if (err instanceof Error) {
                     console.error('ERROR :=>', err.message)
@@ -52,7 +53,9 @@ const GoogleOAuthLoginBtn = () => {
 
     return (
         <div>
-            <button onClick={() => login()}>Login With Google</button>
+            <button type='button' onClick={() => login()}>
+                Login With Google
+            </button>
             {errorMsg && <p>{errorMsg}</p>}
         </div>
     )
