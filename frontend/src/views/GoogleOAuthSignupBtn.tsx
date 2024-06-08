@@ -38,7 +38,11 @@ const GoogleOAuthSignupBtn = () => {
         flow: 'auth-code',
     })
 
-    return <button onClick={() => login()}>Sign Up With Google</button>
+    return (
+        <button type='button' onClick={() => login()}>
+            Sign Up With Google
+        </button>
+    )
 }
 
 export default GoogleOAuthSignupBtn
