@@ -13,9 +13,7 @@ from django.contrib.auth import login
 from django.views.decorators.csrf import csrf_protect
 
 from social_django.utils import psa
-from requests.exceptions import HTTPError
 
-from users.models import User
 from users.serializers import UserSerializer
 
 # TODO: Add note of logger in a best_practices.md doc
@@ -94,7 +92,8 @@ def register_by_access_token(request, backend):
             }
 
             serializer = UserSerializer(data=user_data)
-            existing_user = serializer.get_user_by_email(data=user_data)
+            existing_user = serializer.get_user_by_email(  # type:ignore
+                data=user_data)
             if existing_user is not None:
                 res = Response(
                     {
@@ -109,7 +108,7 @@ def register_by_access_token(request, backend):
             if serializer.is_valid():
                 serializer.save()
 
-            token, _ = Token.objects.get_or_create(user=user)
+            token, _ = Token.objects.get_or_create(user=user)  # type:ignore
             # NOTE: Sets sessionid cookie, is necessary??
             # TODO: Investigate Django login() method more
             login(request, user)

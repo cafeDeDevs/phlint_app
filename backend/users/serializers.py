@@ -8,8 +8,8 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = '__all__'
 
-    def get_user_by_email(self, data):
+    def get_user_by_email(self, data) -> User | None:
         try:
             return User.objects.get(user_email__iexact=data['user_email'])
-        except User.DoesNotExist:
+        except User.DoesNotExist:  # type:ignore
             return None

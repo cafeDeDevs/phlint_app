@@ -14,8 +14,8 @@ class CookieTokenAuthentication(BaseAuthentication):
             return None
 
         try:
-            token = Token.objects.get(key=token_key)
-        except Token.DoesNotExist:
+            token = Token.objects.get(key=token_key)  # type: ignore
+        except Token.DoesNotExist:  # type: ignore
             raise AuthenticationFailed('Invalid token')
 
         return (token.user, token)
