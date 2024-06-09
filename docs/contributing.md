@@ -2,8 +2,8 @@
 
 ## Introduction
 
-First and foremost, thank you for contributing to Phlint App! This short
-documentation covers conventions and guidelines on how best to make coding
+First and foremost, thank you for contributing to Phlint App! This
+document covers conventions and guidelines on how best to make coding
 contributioins to Phlint App. While not strictly enforced rules, these
 guidelines are meant to provide you with essential standards and practices
 common to Open Source Contributions.
@@ -29,24 +29,23 @@ that as you progress.
 ## Git Branches
 
 Once you have taken a ticket, ensure that you first pull in the latest updates
-from the `main` branch. While within the project directory in your development
+from the `dev` branch. While within the project directory in your development
 environment, pull the updates with the `git pull` command:
 
 ```sh
-git pull origin main
+git pull origin dev
 ```
 
 This will ensure that prior to the start of your work, you have all of the
 latest updates of the project on your development machine. Next you'll want to
 start a new branch and change your development environment to work within that
 branch. Naming your new branch should reflect the Ticket/issue. Convention
-encouraged for this practice should include the <em>Ticket Number</em>, the
-<em>Issue Adddressed</em>, and your <em>Github Handle/Name</em>. An example of
-a Ticket with number `001`, Issue Name `add signup to auth`, and handled by
-Github user handle name, `tomit4` would look like this:
+encouraged for this practice should include the <em>Ticket Number</em> and the
+<em>Issue Adddressed</em>. An example of a Ticket with number `001`, Issue Name
+`add signup to auth` would look like this:
 
 ```sh
-001_add_signup_to_auth_tomit4
+001_add_signup_to_auth
 ```
 
 Therefore, creating a new branch and then changing the development environment
@@ -54,10 +53,10 @@ to this branch would utilize the `git checkout` command with the `-b` flag like
 so:
 
 ```sh
-git checkout -b 001_add_signup_to_auth_tomit4
+git checkout -b 001_add_signup_to_auth
 ```
 
-Once within this git branch, you can know start writing code to address this
+Once within this git branch, you can now start writing code to address this
 ticket/issue.
 
 **Commit Messages:**
@@ -65,7 +64,7 @@ ticket/issue.
 As you progress through coding for Phlint, you'll want to keep your code
 relegated towards the Issue or Feature you are addressing. Common convention
 regarding commit messages is that you should commit <em>often</em>. Even if
-your commit is rather mundane like making a small note or is just to save
+your commit is rather mundane, like making a small note or just saving
 your progress, committing more often is almost always better than committing
 less often. This is because a series of commit messages, even if
 redundant, can later be <em>squashed</em> to be more concise, but a single
@@ -89,7 +88,7 @@ simple commit message like this:
 git commit -m "Continuing to refactor set_cookie function, in progress"
 ```
 
-Lets the reader know what you are working on and that the work is, at that time,
+Let the reader know what you are working on and that the work is, at that time,
 not finished. As mentioned earlier, these commits can always be squashed
 into one more generalized commit later on during the development lifecycle.
 
@@ -119,29 +118,33 @@ git commit -m ":recycle: Refactored set_cookie function, httponly to false"
 Note that you can have multiple commits made before `pushing` your commit up to
 the remote repository here on Github. You do <em>not</em> need to push every
 time you make a commit, just push up to the repository when you feel you wish to
-save to the remote. Also note that until your branch is pulled into `main`, that
-you can safely leave unfinished work in your branch, pushed up to github without
-fear of altering the `main` branch. One of the nice things about working with
+save to the remote. Also note that until your branch is pulled into `dev`, that
+you can safely leave unfinished work in your branch, pushed up to GitHub without
+fear of altering the `dev` branch. One of the nice things about working with
 `git` is that it is relatively easy to revert back changes and to fix version
-related issues, so don't be afraid of altering the `main` codebase, the Project
+related issues, so don't be afraid of altering the `dev` codebase, the Project
 Lead will let you know if a branch still needs work before being pulled into the
-`main` branch!
+`dev` branch!
 
 ## Creating A Pull Request
 
-Once you have completed your Ticket, or simply wish to push your commits up to
-the Github remote, you'll first need to set the upstream remote, `origin`, so
-that a remote branch is created to mirror the local branch you created:
+Once you have made what you deem to be a significant amount of work done on the
+Ticket/Issue, you can create a Pull Request on Github so that the Project Lead
+can see your progress, give advice, refactor code, etc. If the Project Lead
+determines your Ticket is Resolved, they will approve your pull request.
+
+To create a pull request, you'll first need to set the upstream remote, `origin`,
+so that a remote branch is created to mirror the local branch you created:
 
 ```sh
-git push --set-upstream origin 001_add_signup_to_auth_tomit4
+git push --set-upstream origin 001_add_signup_to_auth
 ```
 
 You'll then be instructed to `Create a pull request` on Github, by visiting a
 url:
 
 ```
-https://github.com/cafeDeDevs/phlint_app/pull/new/001_add_signup_to_auth_tomit4
+https://github.com/cafeDeDevs/phlint_app/pull/new/001_add_signup_to_auth
 ```
 
 Visit this page, where you'll be presented with a Pull Request template:
@@ -149,7 +152,7 @@ Visit this page, where you'll be presented with a Pull Request template:
 <img src="./assets/contributing_001.png" />
 
 Of importance is the header above the title, which shows which branch you wish
-to merge your devlopment branch with. Usually this is the `main` branch when you
+to merge your development branch with. Usually this is the `main` branch when you
 wish to push your changes to production, <em>but you should change the button
 above that says <b>base:main</b> to read <b>base:dev</b></em>. This is because the Project
 Lead will pull `dev` into `main` once a certain amount of Tickets are resolved. To reiterate,
@@ -165,31 +168,38 @@ point list is encouraged if the Ticket is particularly in depth or complex.
 Lastly, before you click on the Green <em>Create pull request</em> button, make
 sure to click the <em>Gear Icon next to the Assignees</em> field, you'll see a
 drop down list of fellow Contributors presented to you. Most of the time, you'll
-want to Assign the Pull Request to the Project Lead, in this case, that'd be me,
+want to Assign the Pull Request to the Project Lead. In this case, that'd be me,
 `tomit4`.
+
+<em>Note that should you create a pull request priot to you believing that the work
+you are doing is resolved, please prepend your title with the acronym `WIP:`
+(aka Work In Progress). This let's the Project Maintainer know that you are
+still working on this issue, and have simply created a Pull Request so that
+others may keep track of your progress via git commits.</em>
 
 Here is a screenshot of what a filled out Pull Request Form might look like:
 
 <img src="./assets/contributing_002.png" />
 
-Should the you and/or the other contributors wish to comment on the Pull Request
-prior to the Pull Request being approved, you can see comments by visiting the
+Should you and/or the other contributors wish to comment on the pull request
+prior to the pull request being approved, you can see comments by visiting the
 Phlint App's [Github Repository](https://github.com/cafeDeDevs/phlint_app) and
 visit the Pull Request Tab towards the top.
 
 Should any changes to your code be requested prior to the Pull Request being
 approved, you can simply continue to work on the code base on your local
 development branch, add, commit, and push the code as per usual. Once the
-requested changes have been made, there is no need to make another Pull Request,
-simply make another comment on the Pull Request letting the others on your team
-that the changes have been made. Should your changes be approved, you'll see
-that this Pull Request is approved, merged into the `main` branch, and resolved.
+requested changes have been made, there is no need to make another pull request,
+simply make another comment on the pull request's page, letting the others on
+your team know that the changes have been made. Should your changes be approved,
+you'll see that this Pull Request is approved, merged into the `main` branch, and
+resolved.
 
 ### Clean Up
 
-Once finished, you'll want to keep things tidy by deleting the branch <em>both
-locally and remotely</em>. To delete the branch remotely, invoke the following
-command:
+<em>Once your Pull Request is finalized and finished</em>, you'll want to keep things
+tidy by deleting the branch <em>both locally and remotely</em>. To delete the branch
+remotely, invoke the following command:
 
 ```sh
 git push -d origin <branch_name>
@@ -213,6 +223,115 @@ Which, given our previous example, would look like this:
 ```sh
 git branch -d 001_add_signup_to_auth_tomit4
 ```
+
+<em>Note that you should not delete your branch prior to the pull request being
+approved and pulled into `dev`! Should you delete your branch prior to merging
+into `dev`, all work will be lost on the remote as well as your development
+machine. If unsure, do not delete the branch until the Project Maintainer tells
+you to do so</em>.
+
+### A Word On Environment Variables
+
+This section is less related to conventions around git and pull requests, but is
+documented here as it is related to part of our development. Environment
+Variables are secrets related to your a project's development that need to be
+securely stored and kept private. This means that environment secrets <em>cannot
+be pushed up to Github</em>. Common convention is to utilize packages like
+[npm's dotenv](https://www.npmjs.com/package/dotenv), or
+[python-dotenv](https://pypi.org/project/python-dotenv/) that allow one to include
+aliases for sensitive secrets within the codebase.
+
+These secrets are conventionally stored in a hidden `.env` file. In Phlint's
+case, there is a `.env` file located in both the `backend` and `frontend`
+directories, which holds environment secrets related to Phlint App.
+
+In order to ensure these files are not pushed up to Github, you'll notice that
+in the `root`, `backend`, and `frontend`, there is a hidden `.gitignore` file.
+If you are unfamiliar with the conventions around the `.gitignore` file, please
+read [this article from freecodecamp on the subject](https://www.freecodecamp.org/news/gitignore-what-is-it-and-how-to-add-to-repo/). Basically it prevents certain file types, directories,
+and/or files from being pushed up to Github by default.
+
+<em>DO NOT REMOVE ANY FIELDS CURRENTLY IN THE `.gitignore` files!</em> they are
+<em>essential</em> to keeping our application's secrets private!
+
+It is probable that eventually you might need to create a new environment variable,
+especially when interacting with a new third party API. You can append to the
+`.env` file whatever secrets related to the API you might need. An example of
+this might include:
+
+```
+# S3 Credentials
+S3_SIGNIN_KEY="94145jWMq2K1cxUh-PdEi"
+```
+
+In this example, we establish an environment variable calleed `S3_SIGNIN_KEY`.
+Note the all capitalized syntax, this is common convention to differentiate it
+as a constant. On Phlint's backend, you could then import it using python's
+native `os` module, and also the `python-dotenv` library:
+
+```python
+import os
+from dotenv import load_dotenv
+signin_key = os.getenv('S3_SIGNIN_KEY')
+```
+
+Or on the frontend, there is a slight difference in that in using
+[vite](https://vitejs.dev/), environment variables are prepended
+using the `VITE_` syntax:
+
+```
+VITE_BACKEND_TEST_ROUTE=http://localhost:8000/api/test/
+```
+
+And then imported like so:
+
+```typescript
+const testRoute = import.meta.env.VITE_BACKEND_TEST_ROUTE;
+```
+
+Great! We now have secrets defined in our environment variables, and because the
+`.gitignore` file prevents the committing of sensitive secrets up to Github, we
+can write our code without fear of leaking sensitive information. But how do we
+let other developers know about these new environment variables if they cannot
+see them in the latest commits?
+
+You'll notice in both the `frotend` and `backend` directories, there is a
+provided `env-sample` file. In fact if you followed the [Initial Setup
+Guide](https://github.com/cafeDeDevs/phlint_app/blob/main/docs/initial_setup.md),
+you'll notice at one point during the setup we then copy these environment
+variables to a `.env` file:
+
+```sh
+cp env-sample .env
+```
+
+This sample file is essentially the same as the `.env` file, but with the
+secrets removed. This is so that we commit the fact that <em>a new environment
+variable exists</em> to other developers, without giving away the secrets.
+Within the fields provided in these `env-sample` files are the appropriate
+<em>keys</em>(i.e. S3_SIGIN_KEY), but with either dummy data or no data at all
+for their value. Hence the S3_SIGNIN_KEY example from above:
+
+```
+# .env
+# S3 Credentials
+S3_SIGNIN_KEY="94145jWMq2K1cxUh-PdEi"
+```
+
+Becomes in our `env-sample` file:
+
+```
+# env-sample
+# S3 Credentials
+S3_SIGNIN_KEY=""
+```
+
+We can then communicate with other developers what those secrets are over a more
+secure communication channel so they can fill them in by hand. Providing the
+changes to the `env-sample` file is an important part of contributing to Phlint
+App, as it prevents confusion when other developers pull in changes from your
+code and errors are thrown when certain environment variables are left
+`undefined`.
 
 ### Conclusion
 
