@@ -3,6 +3,7 @@ import logging
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
@@ -41,6 +42,31 @@ def set_authentication_cookies(response, access_token, refresh_token, request):
     # NOTE: Sets the csrftoken as cookie by default
     get_token(request)
     return response
+
+
+def remove_authenticated_cookies(response):
+    response.delete('access_token')
+    response.delete('refresh_token')
+    response.delete('csrftoken')
+    response.delete('sessionid')
+    return response
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def logout(request):
+    try:
+        Token.objects.filter(user=request.user).delete()
+        # request.user.auth_token.delete() 
+        logout(request)
+        response = Response({'message': 'User logged out successfully'}, status=status.HTTP_200_OK)
+        response = remove_authenticated_cookies(response)
+
+        logger.info("%s logged out", request.user.email)
+        return response
+    except Exception as e:
+        logger.error("Logout error", str(e))
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)    
+
 
 
 # NOTE: Currently somewhat of a hack using python's native requests lib,
