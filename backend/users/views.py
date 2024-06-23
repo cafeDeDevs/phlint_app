@@ -3,13 +3,13 @@ import logging
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
 from django.conf import settings
 from django.middleware.csrf import get_token
 from django.contrib.auth.models import AnonymousUser
-from django.contrib.auth import login
+from django.contrib.auth import login, logout as django_logout
 from django.views.decorators.csrf import csrf_protect
 
 from social_django.utils import psa
@@ -18,6 +18,7 @@ from users.serializers import UserSerializer
 
 # TODO: Add note of logger in a best_practices.md doc
 logger = logging.getLogger(__name__)
+
 
 
 # NOTE: Helper function for setting cookies (consider moving into separate file/Class)
@@ -41,6 +42,38 @@ def set_authentication_cookies(response, access_token, refresh_token, request):
     # NOTE: Sets the csrftoken as cookie by default
     get_token(request)
     return response
+
+
+
+
+
+def remove_authenticated_cookies(response):
+    response.delete_cookie('access_token')
+    response.delete_cookie('refresh_token')
+    response.delete_cookie('csrftoken')
+    response.delete_cookie('sessionid')
+    return response
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def logout_view(request):
+    logger.debug("Logout view called")
+    try:
+        logger.debug("User: %s", request.user)
+        Token.objects.filter(user=request.user).delete()
+
+        #! important logout as django_logout to avoid conflicts
+        django_logout(request)
+        response = Response({'message': 'User logged out successfully'}, status=status.HTTP_200_OK)
+        response = remove_authenticated_cookies(response)
+        logger.info("%s logged out", request.user.email)
+        return response
+    except Exception as e:
+        logger.error("Logout error: %s", str(e))
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
 
 
 # NOTE: Currently somewhat of a hack using python's native requests lib,
