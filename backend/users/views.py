@@ -45,8 +45,6 @@ def set_authentication_cookies(response, access_token, refresh_token, request):
 
 
 
-
-
 def remove_authenticated_cookies(response):
     response.delete_cookie('access_token')
     response.delete_cookie('refresh_token')
