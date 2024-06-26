@@ -44,42 +44,27 @@ def set_authentication_cookies(response, access_token, refresh_token, request):
 
 
 def remove_authenticated_cookies(response):
-    logger.debug('Removing authenticated cookies')
     response.delete_cookie('access_token')
     response.delete_cookie('refresh_token')
     response.delete_cookie('csrftoken')
     response.delete_cookie('sessionid')
     return response
 
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def logout_view(request):
-    logger.debug("Logout view called")
+def logout_view(request, backend):
     try:
-        logger.debug("User: %s", request.user)
-        logger.debug("Request headers: %s", request.headers)
-        logger.debug("User is authenticated: %s", request.user.is_authenticated)
-        
-        if isinstance(request.user, AnonymousUser):
-            logger.debug("User is AnonymousUser")
-            return Response({'error': 'User not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
-
-        logger.debug("User is authenticated and not AnonymousUser")
+        response = Response({'message': 'User logged out successfully'},
+                            status=status.HTTP_200_OK)
+        remove_authenticated_cookies(response)
         Token.objects.filter(user=request.user).delete()
         django_logout(request)
-        response = Response({'message': 'User logged out successfully'}, status=status.HTTP_200_OK)
-        response = remove_authenticated_cookies(response)
-        logger.debug('Cookies removed')
-
-        if hasattr(request.user, 'email'):
-            logger.info("%s logged out", request.user.email)
-        else:
-            logger.info("User without email attribute logged out")
-
         return response
     except Exception as e:
         logger.error("Logout error: %s", str(e))
-        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response({'error': str(e)},
+                        status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(['POST'])
@@ -119,11 +104,13 @@ def register_by_access_token(request, backend):
             }
 
             serializer = UserSerializer(data=user_data)
-            existing_user = serializer.get_user_by_email(data=user_data)  # type:ignore
+            existing_user = serializer.get_user_by_email(
+                data=user_data)  # type:ignore
             if existing_user is not None:
                 res = Response(
                     {
-                        'message': 'Sign Up Failed. User Already Exists. Please Login.'
+                        'message':
+                        'Sign Up Failed. User Already Exists. Please Login.'
                     },
                     status=status.HTTP_409_CONFLICT)
                 logger.warning(
@@ -143,7 +130,8 @@ def register_by_access_token(request, backend):
                 },
                 status=status.HTTP_200_OK,
             )
-            res = set_authentication_cookies(res, token.key, refresh_token, request)
+            res = set_authentication_cookies(res, token.key, refresh_token,
+                                             request)
 
             logger.info("%s successful signed up", user.email)
             return res
@@ -196,11 +184,13 @@ def login_by_access_token(request, backend):
             }
 
             serializer = UserSerializer(data=user_data)
-            existing_user = serializer.get_user_by_email(data=user_data)  # type:ignore
+            existing_user = serializer.get_user_by_email(
+                data=user_data)  # type:ignore
             if existing_user is None:
                 res = Response(
                     {
-                        'message': 'Login Failed. User Does Not Exist. Please Sign Up.'
+                        'message':
+                        'Login Failed. User Does Not Exist. Please Sign Up.'
                     },
                     status=status.HTTP_401_UNAUTHORIZED)
                 logger.warning(
@@ -219,7 +209,8 @@ def login_by_access_token(request, backend):
                 },
                 status=status.HTTP_200_OK,
             )
-            res = set_authentication_cookies(res, token.key, refresh_token, request)
+            res = set_authentication_cookies(res, token.key, refresh_token,
+                                             request)
 
             logger.info("%s is successfully authenticated, logging in...",
                         user.email)

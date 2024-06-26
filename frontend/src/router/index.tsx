@@ -7,7 +7,6 @@ import AuthPage from '../views/AuthPage'
 import NotFound from '../views/NotFound'
 
 import AuthContextProvider from '../contexts/AuthContextProvider'
-import LogoutPage from '../views/LogoutPage'
 
 const router = createBrowserRouter([
     {
@@ -21,10 +20,6 @@ const router = createBrowserRouter([
     {
         path: '/login',
         element: <Login />,
-    },
-    {
-        path: '/logout',
-        element: <LogoutPage />,
     },
     {
         path: '/auth',
