@@ -1,9 +1,10 @@
 import { createBrowserRouter } from 'react-router-dom'
 
 import App from '../App'
+import AuthPage from '../views/AuthPage'
+import Gallery from '../views/Gallery'
 import Login from '../views/Login'
 import Signup from '../views/Signup'
-import AuthPage from '../views/AuthPage'
 import NotFound from '../views/NotFound'
 
 import AuthContextProvider from '../contexts/AuthContextProvider'
@@ -26,6 +27,14 @@ const router = createBrowserRouter([
         element: (
             <AuthContextProvider>
                 <AuthPage />
+            </AuthContextProvider>
+        ),
+    },
+    {
+        path: '/gallery',
+        element: (
+            <AuthContextProvider>
+                <Gallery />
             </AuthContextProvider>
         ),
     },

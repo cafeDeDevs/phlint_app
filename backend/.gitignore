@@ -17,3 +17,4 @@ env
 test.sh
 *.pem
 venv/
+downloads/

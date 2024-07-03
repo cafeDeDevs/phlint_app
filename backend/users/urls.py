@@ -11,4 +11,5 @@ urlpatterns = [
             views.login_by_access_token),
     re_path('api/logout/' + r'social/(?P<backend>[^/]+)/$', views.logout_view),
     path('api/authentication-test/', views.authentication_test),
+    path('api/get-gallery-test/', views.get_gallery_test),
 ]

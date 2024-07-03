@@ -1,23 +1,120 @@
-import requests
+# TODO: Add note of logger in a best_practices.md doc
+# TODO: Move Helper Functions into separate files based off of utility
+# TODO: Move Routes into respective alternative files (i.e. tidy up, less functions in one file...)
+
+import base64
 import logging
+import os
+import boto3
+import requests
+
+from django.conf import settings
+from django.contrib.auth import login
+from django.contrib.auth import logout as django_logout
+from django.contrib.auth.models import AnonymousUser
+from django.middleware.csrf import get_token
+from django.views.decorators.csrf import csrf_protect
+
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
-from django.conf import settings
-from django.middleware.csrf import get_token
-from django.contrib.auth.models import AnonymousUser
-from django.contrib.auth import login, logout as django_logout
-from django.views.decorators.csrf import csrf_protect
-
 from social_django.utils import psa
 
 from users.serializers import UserSerializer
 
-# TODO: Add note of logger in a best_practices.md doc
 logger = logging.getLogger(__name__)
+
+
+def grab_file_list():
+    try:
+        file_list = []
+        s3 = boto3.client('s3')
+        response = s3.list_objects_v2(Bucket='phlint-app-s3-test')
+        if (response):
+            for contents in response['Contents']:
+                file_list.append(contents["Key"])
+        return file_list
+    except Exception as e:
+        logging.error(e)
+        return []
+
+
+def download_file(file_name, bucket, object_name):
+    s3_client = boto3.client('s3')
+    try:
+        s3_client.download_file(bucket, object_name, file_name)
+    except Exception as e:
+        logging.error(e)
+        return False
+    return True
+
+
+# TODO: Remove Images After User Has Logged Out To Save on Disk Space,
+# !!OR!!: Figure out how to stream images directly from S3 Bucket to User
+# Main Gallery Grabbery and Renderer
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_gallery_test(request):
+    try:
+        file_list = grab_file_list()
+        dir_name = ''
+        galleries = []
+        image_files = []
+
+        # TODO: dynamically create a directory based off of
+        # user's name/credentials and append said strings to
+        # the 'downloads' directory structure
+        if len(file_list) != 0:
+            os.makedirs('downloads', exist_ok=True)
+            for file in file_list:
+                if '/' in file:
+                    dir_name = file[:file.index('/', 0)]
+                    os.makedirs(f'downloads/{dir_name}', exist_ok=True)
+                download_file(f'./downloads/{file}', 'phlint-app-s3-test',
+                              f'{file}')
+        else:
+            return Response({'message': 'No Images In Your Gallery Found.'},
+                            status=status.HTTP_404_NOT_FOUND)
+
+        # TODO: Utilize this for loop to grab the files as well as the dirs,
+        # combine this with the user credentials to create an array/list of dictionaries/objects
+        # which will be rendered instead of just an array of base64 strings
+        for (root, dirs, files) in os.walk('./downloads', topdown=True):
+
+            print('files :=>', files)
+            for dir in dirs:
+                galleries.append(dir)
+
+        # NOTE: Double For Loop == Code Smell?
+        # TODO: Refactor if possible, probably slows down app...
+        for gallery in galleries:
+            img_dir = os.fsencode(f'./downloads/{gallery}')
+            for file in os.listdir(img_dir):
+                filename = os.fsdecode(file)
+                with open(f'downloads/{gallery}/' + filename,
+                          'rb') as image_file:
+                    image_data = base64.b64encode(
+                        image_file.read()).decode('utf-8')
+                image_files.append(image_data)
+
+        return Response(
+            {
+                'message':
+                'Images Retrieved From S3 And Sent To Client Successfully.',
+                'imagesAsBase64': image_files
+            },
+            status=status.HTTP_200_OK)
+    except Exception as e:
+        logging.error(e)
+        return Response(
+            {
+                'message':
+                'An Error Occurred While Trying To Retrieve Your Gallery'
+            },
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 # NOTE: Helper function for setting cookies (consider moving into separate file/Class)

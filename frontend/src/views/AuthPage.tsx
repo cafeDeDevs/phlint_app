@@ -1,10 +1,19 @@
 import { useNavigate } from 'react-router-dom'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { delay } from '../utils/'
 
 const AuthPage = () => {
     const navigate = useNavigate()
+    useEffect(() => {
+        const redirectToGallery = async () => {
+            await delay(3000)
+            navigate('/gallery')
+        }
+        redirectToGallery()
+    }, [])
+
+    /* TODO: Move this into it's own component in the nav bar
     const [errorMsg, setErrorMsg] = useState<string | null>(null)
     const [successMsg, setSuccessMsg] = useState<string | null>(null)
 
@@ -35,19 +44,24 @@ const AuthPage = () => {
             }
         }
     }
+    */
 
     return (
         <>
-            {!successMsg && (
-                <>
-                    <div>Congratulations! You Are Authenticated!</div>
+            <>
+                <div>Congratulations! You Are Authenticated!</div>
+                <div>One Moment While We Redirect You To Your Gallery!...</div>
+                {/*  TODO: Move this into it's own component in the nav bar
                     <button type='button' onClick={logout}>
                         Logout
                     </button>
-                </>
-            )}
+                    */}
+            </>
+            {/* 
             {successMsg && <p>{successMsg}</p>}
             {errorMsg && <p>{errorMsg}</p>}
+
+                */}
         </>
     )
 }
