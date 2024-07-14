@@ -8,10 +8,12 @@ const App = () => {
 
     return (
         <>
-            <h1>App Home Splash Page</h1>
-            <button onClick={() => goToSignup()}>Sign Up</button>
-            <br />
-            <button onClick={() => goToLogin()}>Login</button>
+            <div className='splash-page'>
+                <h1>App Home Splash Page</h1>
+                <button onClick={() => goToSignup()}>Sign Up</button>
+                <br />
+                <button onClick={() => goToLogin()}>Login</button>
+            </div>
         </>
     )
 }

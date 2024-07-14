@@ -1,0 +1,17 @@
+.splash-page {
+    margin-top: 42.5vh;
+}
+
+.signup-card,
+.login-card,
+.auth-page {
+    margin-top: 45vh;
+}
+
+.phlint-app,
+.gallery {
+    width: 80vw;
+}
+.gallery {
+    padding-top: 3.5em;
+}

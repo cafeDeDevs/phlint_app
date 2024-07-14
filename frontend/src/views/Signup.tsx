@@ -7,9 +7,11 @@ const googleClientId = import.meta.env.VITE_GOOGLE_OAUTH2_CLIENT_ID
 const Signup = () => {
     return (
         <>
-            <GoogleOAuthProvider clientId={googleClientId}>
-                <GoogleOAuthSignupBtn />
-            </GoogleOAuthProvider>
+            <div className='signup-card'>
+                <GoogleOAuthProvider clientId={googleClientId}>
+                    <GoogleOAuthSignupBtn />
+                </GoogleOAuthProvider>
+            </div>
         </>
     )
 }
