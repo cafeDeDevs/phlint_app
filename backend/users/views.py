@@ -1,6 +1,6 @@
 # TODO: Add note of logger in a best_practices.md doc
-# TODO: Move Helper Functions into separate files based off of utility
-# TODO: Move Routes into respective alternative files (i.e. tidy up, less functions in one file...)
+# TODO: Move Routes into respective alternative files
+# (i.e. tidy up, all functions within single file should relate to auth, gallery, etc. ...)
 
 import base64
 import logging
@@ -11,7 +11,6 @@ from django.conf import settings
 from django.contrib.auth import login
 from django.contrib.auth import logout as django_logout
 from django.contrib.auth.models import AnonymousUser
-from django.middleware.csrf import get_token
 from django.views.decorators.csrf import csrf_protect
 
 from rest_framework import status
@@ -24,37 +23,20 @@ from social_django.utils import psa
 
 from users.serializers import UserSerializer
 
+from users.utils.auth_utils import set_authentication_cookies, remove_authenticated_cookies
+from users.utils.s3_utils import grab_file_list
+
 logger = logging.getLogger(__name__)
 
 
-def grab_file_list():
-    try:
-        file_list = []
-        s3 = boto3.client('s3')
-        response = s3.list_objects_v2(Bucket='phlint-app-s3-test')
-        if (response):
-            for contents in response['Contents']:
-                file_list.append(contents["Key"])
-        return file_list
-    except Exception as e:
-        logging.error(e)
-        return []
-
-
-# TODO: Remove Images After User Has Logged Out To Save on Disk Space,
-# !!OR!!: Figure out how to stream images directly from S3 Bucket to User
-# Main Gallery Grabbery and Renderer
 @api_view(['GET'])
 @permission_classes([AllowAny])
-def get_gallery_test(request):
+def get_gallery_test(request) -> Response:
     s3_client = boto3.client('s3')
     try:
         file_list = grab_file_list()
         image_files = []
 
-        # TODO: dynamically create a directory based off of
-        # user's name/credentials and append said strings to
-        # the 'downloads' directory structure
         if len(file_list) != 0:
             for file in file_list:
                 if '/' in file:
@@ -83,45 +65,14 @@ def get_gallery_test(request):
             status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-# NOTE: Helper function for setting cookies (consider moving into separate file/Class)
-def set_authentication_cookies(response, access_token, refresh_token, request):
-    response.set_cookie(
-        key='access_token',
-        value=access_token,
-        httponly=True,
-        samesite='None',
-        secure=True,
-        path='/',
-    )
-    response.set_cookie(
-        key='refresh_token',
-        value=refresh_token,
-        httponly=True,
-        samesite='None',
-        secure=True,
-        path='/',
-    )
-    # NOTE: Sets the csrftoken as cookie by default
-    get_token(request)
-    return response
-
-
-def remove_authenticated_cookies(response):
-    response.delete_cookie('access_token')
-    response.delete_cookie('refresh_token')
-    response.delete_cookie('csrftoken')
-    response.delete_cookie('sessionid')
-    return response
-
-
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def logout_view(request, backend):
+def logout_view(request, backend) -> Response:
     try:
         response = Response({'message': 'User logged out successfully'},
                             status=status.HTTP_200_OK)
         remove_authenticated_cookies(response)
-        Token.objects.filter(user=request.user).delete()
+        Token.objects.filter(user=request.user).delete()  #type:ignore
         django_logout(request)
         return response
     except Exception as e:
@@ -133,7 +84,7 @@ def logout_view(request, backend):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 @psa()
-def register_by_access_token(request, backend):
+def register_by_access_token(request, backend) -> Response:
     code = request.data.get('code')
     if not code:
         logger.warning("Request does not have OAuth code")
@@ -167,8 +118,8 @@ def register_by_access_token(request, backend):
             }
 
             serializer = UserSerializer(data=user_data)
-            existing_user = serializer.get_user_by_email(
-                data=user_data)  # type:ignore
+            existing_user = serializer.get_user_by_email(  #type:ignore
+                data=user_data)
             if existing_user is not None:
                 res = Response(
                     {
@@ -213,7 +164,7 @@ def register_by_access_token(request, backend):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 @psa()
-def login_by_access_token(request, backend):
+def login_by_access_token(request, backend) -> Response:
     code = request.data.get('code')
     if not code:
         logger.warning("Request does not have OAuth code")
@@ -247,8 +198,8 @@ def login_by_access_token(request, backend):
             }
 
             serializer = UserSerializer(data=user_data)
-            existing_user = serializer.get_user_by_email(
-                data=user_data)  # type:ignore
+            existing_user = serializer.get_user_by_email(  # type:ignore
+                data=user_data)
             if existing_user is None:
                 res = Response(
                     {
@@ -292,7 +243,7 @@ def login_by_access_token(request, backend):
 
 @api_view(['POST'])
 @csrf_protect
-def authentication_test(request):
+def authentication_test(request) -> Response:
     if isinstance(request.user, AnonymousUser):
         logger.warning("User attempted to login as AnonymousUser")
         return Response(
