@@ -1,7 +1,7 @@
 from django.urls import path, re_path
 
-from users.routes.auth import register_by_access_token, login_by_access_token, logout_view, authentication_test
-from users.routes.gallery import get_gallery_test
+from users.routes.auth import *
+from users.routes.gallery import *
 
 app_name = 'users'
 
