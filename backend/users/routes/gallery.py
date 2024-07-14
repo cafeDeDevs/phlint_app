@@ -7,7 +7,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
-from users.utils.s3_utils import grab_file_list
+from users.utils.s3_utils import *
 
 
 @api_view(['GET'])

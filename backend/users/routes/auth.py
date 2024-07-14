@@ -17,7 +17,7 @@ from social_django.utils import psa
 
 from users.serializers import UserSerializer
 
-from users.utils.auth_utils import set_authentication_cookies, remove_authenticated_cookies
+from users.utils.auth_utils import *
 
 logger = logging.getLogger(__name__)
 
