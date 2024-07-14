@@ -11,7 +11,7 @@ const AuthPage = () => {
             navigate('/gallery')
         }
         redirectToGallery()
-    }, [])
+    }, [navigate])
 
     /* TODO: Move this into it's own component in the nav bar
     const [errorMsg, setErrorMsg] = useState<string | null>(null)
@@ -30,7 +30,7 @@ const AuthPage = () => {
 
             if (!res.ok) {
                 const jsonRes = await res.json()
-                throw new Error(jsonRes.mesage)
+                throw new Error(jsonRes.message)
             }
             setSuccessMsg(
                 'You Have Successfully Logged Out! \nRedirecting you back home!',
