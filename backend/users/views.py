@@ -4,7 +4,6 @@
 
 import base64
 import logging
-import os
 import boto3
 import requests
 
@@ -57,7 +56,6 @@ def get_gallery_test(request):
         # user's name/credentials and append said strings to
         # the 'downloads' directory structure
         if len(file_list) != 0:
-            os.makedirs('downloads', exist_ok=True)
             for file in file_list:
                 if '/' in file:
                     file_obj = s3_client.get_object(
