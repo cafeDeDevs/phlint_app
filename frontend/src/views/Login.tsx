@@ -1,5 +1,6 @@
 import { GoogleOAuthProvider } from '@react-oauth/google'
 import GoogleOAuthLoginBtn from './GoogleOAuthLoginBtn'
+import EmailAuthLoginBtn from './EmailAuthLoginBtn'
 const googleClientId = import.meta.env.VITE_GOOGLE_OAUTH2_CLIENT_ID
 
 const Login = () => {
@@ -9,6 +10,8 @@ const Login = () => {
                 <GoogleOAuthProvider clientId={googleClientId}>
                     <GoogleOAuthLoginBtn />
                 </GoogleOAuthProvider>
+                <br />
+                <EmailAuthLoginBtn />
             </div>
         </>
     )

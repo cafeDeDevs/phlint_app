@@ -1,5 +1,6 @@
 import { GoogleOAuthProvider } from '@react-oauth/google'
 import GoogleOAuthSignupBtn from './GoogleOAuthSignupBtn'
+import EmailAuthSignupBtn from './EmailAuthSignupBtn'
 const googleClientId = import.meta.env.VITE_GOOGLE_OAUTH2_CLIENT_ID
 
 // TODO: Set up where if the User is
@@ -11,6 +12,8 @@ const Signup = () => {
                 <GoogleOAuthProvider clientId={googleClientId}>
                     <GoogleOAuthSignupBtn />
                 </GoogleOAuthProvider>
+                <br />
+                <EmailAuthSignupBtn />
             </div>
         </>
     )

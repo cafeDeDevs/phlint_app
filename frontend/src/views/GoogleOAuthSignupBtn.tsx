@@ -1,13 +1,14 @@
 import { useGoogleLogin } from '@react-oauth/google'
 import { useNavigate } from 'react-router-dom'
+import { useState } from 'react'
+import { delay } from '../utils/'
 
-// TODO: Add An Onboarding Process that
-// asks the user to create a user_name
-// TODO: Display message on All Error Responses
-// (especially on 409 Conflict, user already exists, redirect to login)
+// TODO: Add An Onboarding Process that asks the user to create a user_name and other info
 const GoogleOAuthSignupBtn = () => {
     const navigate = useNavigate()
-    const login = useGoogleLogin({
+    const [errorMsg, setErrorMsg] = useState<string | null>(null)
+
+    const signup = useGoogleLogin({
         onSuccess: async (tokenResponse): Promise<void> => {
             try {
                 const res = await fetch(
@@ -27,21 +28,32 @@ const GoogleOAuthSignupBtn = () => {
                 if (!res.ok) throw new Error('Error While Authenticating User!')
                 navigate('/auth')
             } catch (err) {
-                console.error('ERROR :=>', err)
-                navigate('/')
+                if (err instanceof Error) {
+                    console.error('ERROR :=>', err)
+                    setErrorMsg(err.message)
+                    await delay(3000)
+                    navigate('/')
+                }
             }
         },
-        onError: (err) => {
-            console.error('ERROR :=>', err)
-            navigate('/')
+        onError: async (err) => {
+            if (err instanceof Error) {
+                console.error('ERROR :=>', err.message)
+                setErrorMsg(err.message)
+                await delay(3000)
+                navigate('/')
+            }
         },
         flow: 'auth-code',
     })
 
     return (
-        <button type='button' onClick={() => login()}>
-            Sign Up With Google
-        </button>
+        <>
+            <button type='button' onClick={() => signup()}>
+                Sign Up With Google
+            </button>
+            {errorMsg && <p>{errorMsg}</p>}
+        </>
     )
 }
 

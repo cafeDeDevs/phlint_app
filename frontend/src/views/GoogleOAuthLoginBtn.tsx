@@ -50,12 +50,12 @@ const GoogleOAuthLoginBtn = () => {
     })
 
     return (
-        <div>
+        <>
             <button type='button' onClick={() => login()}>
                 Login With Google
             </button>
             {errorMsg && <p>{errorMsg}</p>}
-        </div>
+        </>
     )
 }
 
