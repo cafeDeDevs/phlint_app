@@ -7,6 +7,8 @@ import Login from '../views/Login'
 import Signup from '../views/Signup'
 import NotFound from '../views/NotFound'
 
+import EmailRegistration from '../views/EmailRegistration'
+
 import AuthContextProvider from '../contexts/AuthContextProvider'
 
 const router = createBrowserRouter([
@@ -41,6 +43,10 @@ const router = createBrowserRouter([
     {
         path: '*',
         element: <NotFound />,
+    },
+    {
+        path: '/email-registration',
+        element: <EmailRegistration />,
     },
 ])
 

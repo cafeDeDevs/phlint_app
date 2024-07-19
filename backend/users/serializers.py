@@ -2,6 +2,11 @@ from rest_framework import serializers
 from users.models import User
 
 
+
+class EmailRegistrationSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+
 class UserSerializer(serializers.ModelSerializer):
 
     class Meta:

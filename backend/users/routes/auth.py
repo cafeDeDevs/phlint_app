@@ -4,18 +4,22 @@ import requests
 from django.conf import settings
 from django.contrib.auth import login
 from django.contrib.auth import logout as django_logout
-from django.contrib.auth.models import AnonymousUser
+from django.contrib.auth.models import AnonymousUser, User
+from django.contrib.auth.tokens import default_token_generator
 from django.views.decorators.csrf import csrf_protect
+from django.urls import reverse 
 
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from django.shortcuts import get_object_or_404
 
 from social_django.utils import psa
 
-from users.serializers import UserSerializer
+from users.serializers import UserSerializer, EmailRegistrationSerializer
+from django.core.mail import send_mail
 
 from users.utils.auth_utils import *
 
@@ -212,3 +216,57 @@ def authentication_test(request) -> Response:
         {'message': "User successfully authenticated"},
         status=status.HTTP_200_OK,
     )
+
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def activate(request, uidb64, token):
+    try:
+        user = get_object_or_404(User, pk=uidb64)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+
+    if user is not None and default_token_generator.check_token(user, token):
+        user.is_active = True
+        user.save()
+        return Response({'message': 'Account activated!'}, status=status.HTTP_200_OK)
+    else:
+        return Response({'message': 'Activation link is invalid!'}, status=status.HTTP_400_BAD_REQUEST)
+    
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def email_registration_view(request):
+    serializer = EmailRegistrationSerializer(data=request.data)
+    if serializer.is_valid():
+        email = serializer.validated_data['email']
+
+        user, created = User.objects.get_or_create(username=email, email=email)
+        if created:
+            user.is_active = False
+            user.save()
+        token = default_token_generator.make_token(user)
+        activation_link = f'http://localhost:5173?token={token}&user_id={user.pk}'
+
+
+        message = f"""
+        <html>
+        <body>
+            <p>Thanks For Signing Up for Phlint! Please click on the button below to complete your sign up process!</p>
+            <a href="{activation_link}" style="padding: 10px 20px; color: white; background-color: blue; text-decoration: none; border-radius: 5px;">Complete Sign Up</a>
+        </body>
+        </html>
+        """
+
+        send_mail(
+            "Email verification",
+            "Text version.",
+            "from@example.com",
+            [email],
+            fail_silently=False,
+            html_message=message,
+        )
+        return Response({'message': 'Email sent!'}, status=status.HTTP_200_OK)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

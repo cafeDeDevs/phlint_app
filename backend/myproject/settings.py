@@ -242,3 +242,16 @@ LOGGING = {
         },
     },
 }
+
+
+#! for testing purposes only
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+DEFAULT_FROM_EMAIL = 'test@test.com'
+
+#! to make this functional
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = smtp server here 
+# EMAIL_PORT = port 
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = host email
+# EMAIL_HOST_PASSWORD = host pw 
