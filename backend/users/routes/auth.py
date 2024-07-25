@@ -14,6 +14,9 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from social_django.utils import psa
 from users.serializers import EmailRegistrationSerializer, UserSerializer
+
+from users.serializers import UserSerializer, AlbumsSerializer, PhotosSerializer, NetworksSerializer
+
 from users.utils.auth_utils import *
 
 logger = logging.getLogger(__name__)
@@ -71,9 +74,10 @@ def register_by_access_token(request, backend) -> Response:
                 'user_email': user.email,
             }
 
-            serializer = UserSerializer(data=user_data)
-            existing_user = serializer.get_user_by_email(  #type:ignore
+            user_serializer = UserSerializer(data=user_data)
+            existing_user = user_serializer.get_user_by_email(  #type:ignore
                 data=user_data)
+
             if existing_user is not None:
                 res = Response(
                     {
@@ -85,8 +89,16 @@ def register_by_access_token(request, backend) -> Response:
                     "%s attempted to sign up, but already has account",
                     user.email)
                 return res
-            if serializer.is_valid():
-                serializer.save()
+            if user_serializer.is_valid():
+                albums_data = {
+                    'title': 'default_album',
+                    's3_url': 'https://fake_for_now.com',
+                    'is_private': False,
+                    'user_id': existing_user.id,  #type:ignore
+                }
+                album_serializer = AlbumsSerializer(data=albums_data)
+                album_serializer.create_album(data=albums_data)  #type:ignore
+                user_serializer.save()
 
             token, _ = Token.objects.get_or_create(user=user)  # type:ignore
             login(request, user)
@@ -151,8 +163,8 @@ def login_by_access_token(request, backend) -> Response:
                 'user_email': user.email,
             }
 
-            serializer = UserSerializer(data=user_data)
-            existing_user = serializer.get_user_by_email(  # type:ignore
+            user_serializer = UserSerializer(data=user_data)
+            existing_user = user_serializer.get_user_by_email(  # type:ignore
                 data=user_data)
             if existing_user is None:
                 res = Response(
