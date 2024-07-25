@@ -30,6 +30,7 @@ class AlbumsSerializer(serializers.ModelSerializer):
         model = Albums
         fields = '__all__'
 
+    # TODO: adjust logic so that if album already exists, it throws an exception
     def create_album(self, data) -> Albums | None:
         try:
             new_album = Albums(
@@ -51,9 +52,36 @@ class PhotosSerializer(serializers.ModelSerializer):
         model = Photos
         fields = '__all__'
 
+    # TODO: adjust logic so that if photo already exists, it throws an exception
+    def create_photo(self, data) -> Photos | None:
+        try:
+            new_photo = Photos(
+                album_id=data['album_id'],
+                s3_url=data['s3_url'],
+            )
+            new_photo.save()
+            return new_photo
+        except Exception as e:
+            logger.error("Error while creating photo: %s", str(e))
+            return None
+
 
 class NetworksSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Networks
         fields = '__all__'
+
+    # TODO: adjust logic so that if photo already exists, it throws an exception
+    def create_network(self, data) -> Networks | None:
+        try:
+            new_network = Networks(
+                founder_id=data['founder_id'],
+                user_id=data['user_id'],
+                album_id=data['album_id'],
+            )
+            new_network.save()
+            return new_network
+        except Exception as e:
+            logger.error("Error while creating network: %s", str(e))
+            return None

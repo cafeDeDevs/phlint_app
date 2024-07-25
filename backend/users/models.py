@@ -17,7 +17,7 @@ class Albums(models.Model):
 
 
 class Photos(models.Model):
-    album_id = models.ForeignKey(Albums, on_delete=models.CASCADE)
+    album = models.ForeignKey(Albums, on_delete=models.CASCADE)
     date = models.DateTimeField(auto_now_add=True)
     s3_url = models.CharField(max_length=255)
     objects = models.Manager()
@@ -25,6 +25,6 @@ class Photos(models.Model):
 
 class Networks(models.Model):
     founder_id = models.IntegerField()
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
-    album_id = models.ForeignKey(Albums, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    album = models.ForeignKey(Albums, on_delete=models.CASCADE)
     objects = models.Manager()

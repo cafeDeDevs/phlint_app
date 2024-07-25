@@ -1,3 +1,6 @@
+# TODO: Refactor so that repeated declarations
+# and logic is abstracted as dicts, lists, or helper funcs
+# TODO: Remove all #type:ignore using proper type checking
 import logging
 
 import requests
@@ -89,16 +92,38 @@ def register_by_access_token(request, backend) -> Response:
                     "%s attempted to sign up, but already has account",
                     user.email)
                 return res
+            # NOTE: If the user_serializer receives the appropriate data,
+            # then the following series of table populations execute,
+            # creating default data for the Albums, Photos, and Networks table
+            # i.e. the user gets one new album, photo, and network
+            # they are the owner/participant of
             if user_serializer.is_valid():
+                # TODO: Most of this needs a helper function
+                new_user = user_serializer.save()
+                # TODO: Address need for proper s3_url in
+                # albums_data and photos_data and save via boto3
                 albums_data = {
                     'title': 'default_album',
                     's3_url': 'https://fake_for_now.com',
                     'is_private': False,
-                    'user_id': existing_user.id,  #type:ignore
+                    'user_id': new_user.id
                 }
                 album_serializer = AlbumsSerializer(data=albums_data)
-                album_serializer.create_album(data=albums_data)  #type:ignore
-                user_serializer.save()
+                new_album = album_serializer.create_album(
+                    data=albums_data)  #type:ignore
+                photos_data = {
+                    's3_url': 'https://fake_for_now.com',
+                    'album_id': new_album.id,
+                }
+                photo_serializer = PhotosSerializer(data=photos_data)
+                photo_serializer.create_photo(data=photos_data)
+                networks_data = {
+                    'founder_id': new_user.id,
+                    'user_id': new_user.id,
+                    'album_id': new_album.id,
+                }
+                network_serializer = NetworksSerializer(data=networks_data)
+                network_serializer.create_network(data=networks_data)
 
             token, _ = Token.objects.get_or_create(user=user)  # type:ignore
             login(request, user)
