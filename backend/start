@@ -1,1 +1,1 @@
-python manage.py runserver
+source env/bin/activate && python manage.py runserver
