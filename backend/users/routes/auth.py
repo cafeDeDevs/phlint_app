@@ -1,26 +1,19 @@
 import logging
-import requests
 
+import requests
 from django.conf import settings
 from django.contrib.auth import login
 from django.contrib.auth import logout as django_logout
-from django.contrib.auth.models import AnonymousUser, User
-from django.contrib.auth.tokens import default_token_generator
+from django.contrib.auth.models import AnonymousUser
+from django.core.mail import send_mail
 from django.views.decorators.csrf import csrf_protect
-from django.urls import reverse 
-
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from django.shortcuts import get_object_or_404
-
 from social_django.utils import psa
-
-from users.serializers import UserSerializer, EmailRegistrationSerializer
-from django.core.mail import send_mail
-
+from users.serializers import EmailRegistrationSerializer, UserSerializer
 from users.utils.auth_utils import *
 
 logger = logging.getLogger(__name__)
@@ -218,55 +211,64 @@ def authentication_test(request) -> Response:
     )
 
 
+# TODO: Get to this later
+# NOTE: Don't use default_token_generator, we'll be writing our own implementation
+#  @api_view(['GET'])
+#  @permission_classes([AllowAny])
+#  def activate(request, uidb64, token):
+#  try:
+#  user = get_object_or_404(User, pk=uidb64)
+#  except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+#  user = None
 
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def activate(request, uidb64, token):
-    try:
-        user = get_object_or_404(User, pk=uidb64)
-    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
-        user = None
-
-    if user is not None and default_token_generator.check_token(user, token):
-        user.is_active = True
-        user.save()
-        return Response({'message': 'Account activated!'}, status=status.HTTP_200_OK)
-    else:
-        return Response({'message': 'Activation link is invalid!'}, status=status.HTTP_400_BAD_REQUEST)
-    
+#  if user is not None and default_token_generator.check_token(user, token):
+#  user.is_active = True
+#  user.save()
+#  return Response({'message': 'Account activated!'},
+#  status=status.HTTP_200_OK)
+#  else:
+#  return Response({'message': 'Activation link is invalid!'},
+#  status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
-def email_registration_view(request):
-    serializer = EmailRegistrationSerializer(data=request.data)
-    if serializer.is_valid():
-        email = serializer.validated_data['email']
+def email_registration_view(request) -> Response:
+    try:
+        serializer = EmailRegistrationSerializer(data=request.data)
+        if serializer.is_valid():
+            email = serializer.validated_data['email']  #type:ignore
 
-        user, created = User.objects.get_or_create(username=email, email=email)
-        if created:
-            user.is_active = False
-            user.save()
-        token = default_token_generator.make_token(user)
-        activation_link = f'http://localhost:5173?token={token}&user_id={user.pk}'
+            # TODO: persist token in DB or redis cache
+            token = generate_sha256_hash(email)
+            activation_link = f'http://localhost:5173?token={token}'
 
+            # TODO: replace this with a template .html file,
+            # and spruce it up with some nice styling
+            message = f"""
+            <html>
+            <body>
+                <p>Thanks For Signing Up for Phlint! Please click on the button below to complete your sign up process!</p>
+                <a href="{activation_link}" style="padding: 10px 20px; color: white; background-color: blue; text-decoration: none; border-radius: 5px;">Complete Sign Up</a>
+            </body>
+            </html>
+            """
 
-        message = f"""
-        <html>
-        <body>
-            <p>Thanks For Signing Up for Phlint! Please click on the button below to complete your sign up process!</p>
-            <a href="{activation_link}" style="padding: 10px 20px; color: white; background-color: blue; text-decoration: none; border-radius: 5px;">Complete Sign Up</a>
-        </body>
-        </html>
-        """
-
-        send_mail(
-            "Email verification",
-            "Text version.",
-            "from@example.com",
-            [email],
-            fail_silently=False,
-            html_message=message,
-        )
-        return Response({'message': 'Email sent!'}, status=status.HTTP_200_OK)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            send_mail(
+                "Email verification",
+                "Text version.",
+                settings.DEFAULT_FROM_EMAIL,
+                [email],
+                fail_silently=False,
+                html_message=message,
+            )
+            res = Response({'message': 'Email sent!'},
+                           status=status.HTTP_200_OK)
+        else:
+            res = Response(serializer.errors,
+                           status=status.HTTP_400_BAD_REQUEST)
+        return res
+    except Exception as e:
+        logger.error("%s Uncaught Exception Error:", str(e))
+        return Response({'message': str(e)},
+                        status=status.HTTP_500_INTERNAL_SERVER_ERROR)
