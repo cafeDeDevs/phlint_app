@@ -1,7 +1,8 @@
-VITE_GOOGLE_OAUTH2_CLIENT_ID=591562931148-5laq5b9i8v4euk7ag114pgh7rlt7s44g.apps.googleusercontent.com
+VITE_GOOGLE_OAUTH2_CLIENT_ID=
 VITE_BACKEND_REGISTRATION_ROUTE=http://localhost:8000/api/register-by-access-token/social/google-oauth2/
 VITE_BACKEND_LOGIN_ROUTE=http://localhost:8000/api/login-by-access-token/social/google-oauth2/
 VITE_BACKEND_LOGOUT_ROUTE=http://localhost:8000/api/logout/social/google-oauth2/
 VITE_BACKEND_TEST_ROUTE=http://localhost:8000/api/authentication-test/
 VITE_BACKEND_LOGOUT_ROUTE=http://localhost:8000/api/logout/
 VITE_BACKEND_GALLERY_ROUTE=http://localhost:8000/api/get-gallery-test/
+VITE_BACKEND_EMAIL_REGISTRATION_ROUTE=http://localhost:8000/api/email-registration/
