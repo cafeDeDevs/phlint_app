@@ -1,3 +1,9 @@
+import os
+import hmac
+import base64
+from hashlib import sha256
+from time import time
+
 from django.middleware.csrf import get_token
 
 
@@ -30,3 +36,12 @@ def remove_authenticated_cookies(response):
     response.delete_cookie('csrftoken')
     response.delete_cookie('sessionid')
     return response
+
+
+def generate_sha256_hash(email):
+    secret_key = os.urandom(32)
+    timestamp = str(int(time())).encode('utf-8')
+    message = email.encode('utf-8') + timestamp
+    signature = hmac.new(secret_key, message, sha256).digest()
+    token = base64.urlsafe_b64encode(message + signature).decode('utf-8')
+    return token
