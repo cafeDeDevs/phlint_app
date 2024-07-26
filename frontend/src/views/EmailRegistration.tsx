@@ -1,13 +1,13 @@
-import React, { useState, FormEvent } from 'react'
+import { type FC, useState, FormEvent } from 'react'
 
-const EmailRegistrationForm: React.FC = () => {
+const EmailRegistrationForm: FC = () => {
     const [email, setEmail] = useState<string>('')
     const [message, setMessage] = useState<string>('')
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault()
         try {
-            const response = await fetch(
+            const res = await fetch(
                 import.meta.env.VITE_BACKEND_EMAIL_REGISTRATION_ROUTE,
                 {
                     method: 'POST',
@@ -17,15 +17,19 @@ const EmailRegistrationForm: React.FC = () => {
                     body: JSON.stringify({ email }),
                 },
             )
-            const data = await response.json()
-            if (response.ok) {
-                setMessage(data.message)
+            // TODO: Remove else clause and simply navigate('/onboarding')
+            // NOTE: onboarding route not yet implemented
+            if (!res.ok) {
+                const jsonRes = await res.json()
+                throw new Error(jsonRes.message)
             } else {
-                setMessage('Failed to send email. Please try again.')
+                const jsonRes = await res.json()
+                setMessage(jsonRes.message)
             }
-        } catch (error) {
-            console.error('Error:', error)
-            setMessage('Failed to send email. Please try again.')
+        } catch (err) {
+            const error = err as Error
+            console.error('ERROR :=>', error.message)
+            setMessage(error.message)
         }
     }
 
@@ -33,15 +37,16 @@ const EmailRegistrationForm: React.FC = () => {
         <div>
             <h1>Email Registration</h1>
             <form onSubmit={handleSubmit}>
-                <label>
-                    Email:
-                    <input
-                        type='email'
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                    />
-                </label>
+                <label htmlFor='email-form'>Please Enter Your Email:</label>
+                <br />
+                <input
+                    type='email'
+                    id='email-form'
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                />
+                <br />
                 <button type='submit'>Register</button>
             </form>
             {message && <p>{message}</p>}
