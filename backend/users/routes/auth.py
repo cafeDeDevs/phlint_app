@@ -16,10 +16,8 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from social_django.utils import psa
-from users.serializers import EmailRegistrationSerializer, UserSerializer
 
-from users.serializers import UserSerializer, AlbumsSerializer, PhotosSerializer, NetworksSerializer
-
+from users.serializers import *
 from users.utils.auth_utils import *
 
 logger = logging.getLogger(__name__)
