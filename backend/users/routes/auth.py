@@ -3,6 +3,7 @@
 # TODO: Remove all #type:ignore using proper type checking
 import logging
 
+import redis
 import requests
 from django.conf import settings
 from django.contrib.auth import login
@@ -21,6 +22,11 @@ from users.serializers import *
 from users.utils.auth_utils import *
 
 logger = logging.getLogger(__name__)
+
+redis_instance = redis.StrictRedis(host=settings.REDIS_HOST,
+                                   port=settings.REDIS_PORT,
+                                   password=settings.REDIS_PASS,
+                                   db=0)
 
 
 @api_view(['POST'])
@@ -274,8 +280,14 @@ def email_registration_view(request) -> Response:
         if serializer.is_valid():
             email = serializer.validated_data['email']  #type:ignore
 
-            # TODO: persist token in DB or redis cache
             token = generate_sha256_hash(email)
+
+            # NOTE: Persists key/value pair associatin raw string email with token for 120 seconds
+            redis_instance.set(f'signup_token_for_{email}', token, ex=120)
+            # TODO: Remove later, this is just a demonstration
+            token_value = redis_instance.get(f'signup_token_for_{email}')
+            print(token_value)
+
             activation_link = f'http://localhost:5173?token={token}'
 
             # TODO: replace this with a template .html file,
