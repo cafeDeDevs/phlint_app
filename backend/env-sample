@@ -7,6 +7,10 @@ PG_DB="django_db"
 PG_CONTAINER_NAME="django_db"
 PG_PASS="postgres"
 
+# Redis Config
+REDIS_PORT=6380
+REDIS_PASS="redis"
+
 # OAuth Credentials
 SOCIAL_AUTH_GOOGLE_OAUTH2_CLIENT_ID=""
 SOCIAL_AUTH_GOOGLE_OAUTH2_CLIENT_SECRET=""
