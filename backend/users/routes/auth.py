@@ -288,8 +288,10 @@ def email_registration_view(request) -> Response:
             token_value = redis_instance.get(f'signup_token_for_{email}')
             print(token_value)
 
-            activation_link = f'http://localhost:5173?token={token}'
-
+            # activation_link = f'http://localhost:5173?token={token}'
+            
+            activation_link = f'http://localhost:5173/onboarding/?token={token}'
+            
             # TODO: replace this with a template .html file,
             # and spruce it up with some nice styling
             message = f"""
