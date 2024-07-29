@@ -1,5 +1,29 @@
 import React, { useState } from 'react'
+import { z } from 'zod'
 import { useNavigate } from 'react-router-dom'
+
+const passwordSchemaRegex = new RegExp(
+    [
+        /^(?=.*[a-z])/, // At least one lowercase letter
+        /(?=.*[A-Z])/, // At least one uppercase letter
+        /(?=.*\d)/, // At least one digit
+        /(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?])/, // At least one special character
+        /[A-Za-z\d!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]{10,}$/, // At least 10 characters long
+    ]
+        .map((r) => r.source)
+        .join(''),
+)
+
+const passwordSchema = z
+    .string()
+    .regex(
+        passwordSchemaRegex,
+        'Password must be at least 10 characters long and contain at least one lowercase letter, one uppercase letter, one digit, and one special character.',
+    )
+
+const usernameSchema = z
+    .string()
+    .min(5, 'Username must be at least 5 characters long.')
 
 const Onboarding = () => {
     const [username, setUsername] = useState('')
@@ -10,15 +34,40 @@ const Onboarding = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        if (password !== confirmPassword) {
-            setError('Passwords do not match!')
+        setError('')
+
+        try {
+            usernameSchema.parse(username)
+        } catch (err) {
+            if (err instanceof z.ZodError) {
+                setError(err.errors[0].message)
+            } else {
+                setError('An unexpected error occurred.')
+            }
             return
         }
 
-        const token = new URLSearchParams(location.search).get('token')
+        try {
+            passwordSchema.parse(password)
+        } catch (err) {
+            if (err instanceof z.ZodError) {
+                setError(err.errors[0].message)
+            } else {
+                setError('An unexpected error occurred.')
+            }
+            return
+        }
+
+        if (password !== confirmPassword) {
+            setError('Passwords do not match')
+            return
+        }
+
+        const token = new URLSearchParams(window.location.search).get('token')
 
         try {
-            const res = await fetch('/api/onboarding-view', {
+            //! Fetch to activate
+            const res = await fetch('/api/activate', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -27,16 +76,22 @@ const Onboarding = () => {
             })
 
             if (!res.ok) {
-                // catch server side error
+                // Catch server-side error
                 const errData = await res.json()
-                throw new Error(errData.message)
+                throw new Error(errData.message || 'Server error')
             }
 
-            // # TODO: navigate elsewhere
+            //! Redirect to next page
             navigate('/')
         } catch (err: any) {
-            // cathc either error
-            setError('An error occurred: ' + err.message)
+            // Catch client-side or network error
+            console.error(
+                'Client error: ',
+                err.message || 'Unknown client error',
+            )
+            setError(
+                'A network error occurred. Please check your connection and try again.',
+            )
         }
     }
 
