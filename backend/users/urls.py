@@ -14,5 +14,6 @@ urlpatterns = [
     path('api/authentication-test/', authentication_test),
     path('api/get-gallery-test/', get_gallery_test),
     path('api/email-registration/', email_registration_view),
-    #  path('api/activate/<int:uidb64>/<str:token>/', activate, name='activate'),
+    path('api/activate/', activate, name='activate'),   
+      #  path('api/activate/<int:uidb64>/<str:token>/', activate, name='activate'),
 ]

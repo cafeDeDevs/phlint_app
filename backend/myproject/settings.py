@@ -263,4 +263,4 @@ EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 
 # Signify a custom user model since we aren't using Django's default
-AUTH_USER_MODEL = 'myproject.User' 
+AUTH_USER_MODEL = 'users.User' 

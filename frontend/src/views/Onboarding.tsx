@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import { z } from 'zod'
-import { useNavigate } from 'react-router-dom'
 
 const passwordSchemaRegex = new RegExp(
     [
@@ -30,11 +29,12 @@ const Onboarding = () => {
     const [password, setPassword] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
     const [error, setError] = useState('')
-    const navigate = useNavigate()
+    const [success, setSuccess] = useState('')
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         setError('')
+        setSuccess('')
 
         try {
             usernameSchema.parse(username)
@@ -64,25 +64,28 @@ const Onboarding = () => {
         }
 
         const token = new URLSearchParams(window.location.search).get('token')
+        // const csrfToken = getCookie('csrftoken')
 
         try {
-            //! Fetch to activate
-            const res = await fetch('/api/activate', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
+            const res = await fetch(
+                import.meta.env.VITE_BACKEND_ONBOARD_ROUTE,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, password, token }),
                 },
-                body: JSON.stringify({ username, password, token }),
-            })
+            )
+
+            // result for setting the success message
+            const result = await res.json()
 
             if (!res.ok) {
                 // Catch server-side error
-                const errData = await res.json()
-                throw new Error(errData.message || 'Server error')
+                throw new Error(result.message || 'Server error')
             }
-
-            //! Redirect to next page
-            navigate('/')
+            setSuccess(result.message)
         } catch (err: any) {
             // Catch client-side or network error
             console.error(
@@ -127,6 +130,7 @@ const Onboarding = () => {
                     />
                 </div>
                 {error && <p style={{ color: 'red' }}>{error}</p>}
+                {success && <p style={{ color: 'green' }}>{success}</p>}
                 <button type='submit'>Complete Registration</button>
             </form>
         </div>
