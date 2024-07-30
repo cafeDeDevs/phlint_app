@@ -17,9 +17,17 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from social_django.utils import psa
+from .models import User 
 
 from users.serializers import *
 from users.utils.auth_utils import *
+
+# AES Encryption algorithm from boot.dev
+from base64 import b64encode, b64decode
+import hashlib
+from Cryptodome.Cipher import AES
+from Cryptodome.Random import get_random_bytes
+
 
 logger = logging.getLogger(__name__)
 
@@ -27,6 +35,31 @@ redis_instance = redis.StrictRedis(host=settings.REDIS_HOST,
                                    port=settings.REDIS_PORT,
                                    password=settings.REDIS_PASS,
                                    db=0)
+
+
+
+def encrypt(plain_text, password):
+    salt = get_random_bytes(AES.block_size)
+    private_key = hashlib.scrypt(password.encode(), salt=salt, n=2**14, r=8, p=1, dklen=32)
+    cipher_config = AES.new(private_key, AES.MODE_GCM)
+    cipher_text, tag = cipher_config.encrypt_and_digest(bytes(plain_text, 'utf-8'))
+    return {
+        'cipher_text': b64encode(cipher_text).decode('utf-8'),
+        'salt': b64encode(salt).decode('utf-8'),
+        'nonce': b64encode(cipher_config.nonce).decode('utf-8'),
+        'tag': b64encode(tag).decode('utf-8')
+    }
+
+def decrypt(enc_dict, password):
+    salt = b64decode(enc_dict['salt'])
+    cipher_text = b64decode(enc_dict['cipher_text'])
+    nonce = b64decode(enc_dict['nonce'])
+    tag = b64decode(enc_dict['tag'])
+    private_key = hashlib.scrypt(password.encode(), salt=salt, n=2**14, r=8, p=1, dklen=32)
+    cipher = AES.new(private_key, AES.MODE_GCM, nonce=nonce)
+    decrypted = cipher.decrypt_and_verify(cipher_text, tag)
+    return decrypted
+
 
 
 @api_view(['POST'])
@@ -254,6 +287,64 @@ def authentication_test(request) -> Response:
 
 # TODO: Get to this later
 # NOTE: Don't use default_token_generator, we'll be writing our own implementation
+
+
+
+
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def activate(request):
+    try:
+        data = json.loads(request.body)
+        username = data.get('username')
+        password = data.get('password')
+        token_str = data.get('token')
+
+        if not username or not password or not token_str:
+            return JsonResponse({'message': 'All fields are required'}, status=400)
+
+        # Define the regex patterns
+        username_pattern = re.compile(r'^.{5,}$')
+        password_pattern = re.compile(
+            r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};:\'"\\|,.<>/?]).{10,}$'
+        )
+
+        # Validate the username
+        if not username_pattern.match(username):
+            return JsonResponse({'message': 'Invalid username'}, status=401)
+
+        # Validate the password
+        if not password_pattern.match(password):
+            return JsonResponse({'message': 'Invalid password'}, status=401)
+
+        # Validate the token and activate the user
+        email = tokens.get(token_str)
+        if not email:
+            return JsonResponse({'message': 'Invalid token'}, status=401)
+
+        # Encrypt the password
+        encrypted_password = encrypt(password, settings.SECRET_KEY)
+
+        user = User.objects.create(
+            user_name=username,
+            user_password=json.dumps(encrypted_password),  # Store the encrypted password as JSON
+            user_email=email,
+            is_active=True
+        )
+
+        # Optionally delete the token after activation
+        del tokens[token_str]
+
+        return JsonResponse({'message': 'User activated successfully'}, status=200)
+
+    except json.JSONDecodeError:
+        return JsonResponse({'message': 'Invalid JSON'}, status=400)
+
+    except Exception as e:
+        return JsonResponse({'message': str(e)}, status=500)
+
 #  @api_view(['GET'])
 #  @permission_classes([AllowAny])
 #  def activate(request, uidb64, token):
@@ -291,7 +382,7 @@ def email_registration_view(request) -> Response:
             # activation_link = f'http://localhost:5173?token={token}'
             
             activation_link = f'http://localhost:5173/onboarding/?token={token}'
-            
+
             # TODO: replace this with a template .html file,
             # and spruce it up with some nice styling
             message = f"""
