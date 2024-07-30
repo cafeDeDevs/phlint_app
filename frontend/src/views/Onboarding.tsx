@@ -64,7 +64,6 @@ const Onboarding = () => {
         }
 
         const token = new URLSearchParams(window.location.search).get('token')
-        // const csrfToken = getCookie('csrftoken')
 
         try {
             const res = await fetch(
@@ -78,7 +77,6 @@ const Onboarding = () => {
                 },
             )
 
-            // result for setting the success message
             const result = await res.json()
 
             if (!res.ok) {
