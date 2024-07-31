@@ -348,6 +348,10 @@ def activate(request):
         # Optionally delete the token after activation
         redis_instance.delete(f'signup_token_for_{token_str}')
 
+        # TODO: Print decrypted password for demonstration purposes in the console
+        decrypted_password = decrypt(encrypted_password, settings.SECRET_KEY)
+        print(f"Decrypted password: {decrypted_password.decode('utf-8')}")
+
         return JsonResponse({'message': 'User activated successfully'}, status=200)
 
     except json.JSONDecodeError:
