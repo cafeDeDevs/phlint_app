@@ -71,8 +71,8 @@ const Onboarding = () => {
             setSuccess(jsonRes.message)
         } catch (err) {
             const error = err as Error
-            console.error(error.message || 'Unknown error')
             setError(error.message)
+            throw new Error(error.message || 'Unknown error')
         }
     }
 
