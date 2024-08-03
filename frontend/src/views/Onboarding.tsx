@@ -40,14 +40,16 @@ const Onboarding = () => {
             if (err instanceof z.ZodError) {
                 setError(err.errors[0].message)
             } else {
-                setError('An unexpected error occurred.')
+                const error = err as Error
+                setError(error.message)
+                throw new Error(error.message)
             }
             return
         }
 
         if (password !== confirmPassword) {
             setError('Passwords do not match')
-            return
+            throw new Error('Passwords do not match')
         }
 
         try {
