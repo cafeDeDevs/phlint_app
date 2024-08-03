@@ -1,28 +1,8 @@
 import React, { useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import { z } from 'zod'
 
-const passwordSchemaRegex = new RegExp(
-    [
-        /^(?=.*[a-z])/, // At least one lowercase letter
-        /(?=.*[A-Z])/, // At least one uppercase letter
-        /(?=.*\d)/, // At least one digit
-        /(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?])/, // At least one special character
-        /[A-Za-z\d!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]{10,}$/, // At least 10 characters long
-    ]
-        .map((r) => r.source)
-        .join(''),
-)
-
-const passwordSchema = z
-    .string()
-    .regex(
-        passwordSchemaRegex,
-        'Password must be at least 10 characters long and contain at least one lowercase letter, one uppercase letter, one digit, and one special character.',
-    )
-
-const usernameSchema = z
-    .string()
-    .min(5, 'Username must be at least 5 characters long.')
+import { usernameSchema, passwordSchema } from '../utils/'
 
 const Onboarding = () => {
     const [username, setUsername] = useState('')
@@ -30,6 +10,11 @@ const Onboarding = () => {
     const [confirmPassword, setConfirmPassword] = useState('')
     const [error, setError] = useState('')
     const [success, setSuccess] = useState('')
+
+    const location = useLocation()
+
+    const queryParams = new URLSearchParams(location.search)
+    const token = queryParams.get('token')
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -41,10 +26,12 @@ const Onboarding = () => {
         } catch (err) {
             if (err instanceof z.ZodError) {
                 setError(err.errors[0].message)
+                throw new Error(err.errors[0].message)
             } else {
-                setError('An unexpected error occurred.')
+                const error = err as Error
+                setError(error.message)
+                throw new Error(error.message)
             }
-            return
         }
 
         try {
@@ -63,8 +50,6 @@ const Onboarding = () => {
             return
         }
 
-        const token = new URLSearchParams(window.location.search).get('token')
-
         try {
             const res = await fetch(
                 import.meta.env.VITE_BACKEND_ONBOARD_ROUTE,
@@ -77,22 +62,15 @@ const Onboarding = () => {
                 },
             )
 
-            const result = await res.json()
-
+            const jsonRes = await res.json()
             if (!res.ok) {
-                // Catch server-side error
-                throw new Error(result.message || 'Server error')
+                throw new Error(jsonRes.message || 'Server error')
             }
-            setSuccess(result.message)
-        } catch (err: any) {
-            // Catch client-side or network error
-            console.error(
-                'Client error: ',
-                err.message || 'Unknown client error',
-            )
-            setError(
-                'A network error occurred. Please check your connection and try again.',
-            )
+            setSuccess(jsonRes.message)
+        } catch (err) {
+            const error = err as Error
+            console.error(error.message || 'Unknown error')
+            setError(error.message)
         }
     }
 
