@@ -250,10 +250,8 @@ LOGGING = {
     },
 }
 
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# edited to resolve the SSL error
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-EMAIL_USE_TLS = False
+EMAIL_BACKEND = os.getenv('EMAIL_BACKEND')
+EMAIL_USE_TLS = True if os.getenv('EMAIL_USE_TLS') == 'True' else False
 EMAIL_USE_SSL = False
 
 DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL')
@@ -262,6 +260,3 @@ EMAIL_PORT = os.getenv('EMAIL_PORT')
 # TODO: Change Email Host User to official Phlint Email Account
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
-
-# Signify a custom user model since we aren't using Django's default
-AUTH_USER_MODEL = 'users.User' 
