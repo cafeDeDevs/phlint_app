@@ -28,3 +28,10 @@ EMAIL_HOST=
 EMAIL_PORT=
 EMAIL_HOST_USER=
 EMAIL_HOST_PASSWORD=
+
+# Email Security Settings
+EMAIL_BACKEND='django.core.mail.backends.console.EmailBackend'
+# NOTE: Use this in prod:
+#  EMAIL_BACKEND='django.core.mail.backends.smtp.EmailBackend'
+# NOTE: Set to 'True' in prod
+EMAIL_USE_TLS='False'
