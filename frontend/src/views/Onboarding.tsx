@@ -39,12 +39,12 @@ const Onboarding = () => {
         } catch (err) {
             if (err instanceof z.ZodError) {
                 setError(err.errors[0].message)
+                throw new Error(err.errors[0].message)
             } else {
                 const error = err as Error
                 setError(error.message)
                 throw new Error(error.message)
             }
-            return
         }
 
         if (password !== confirmPassword) {
