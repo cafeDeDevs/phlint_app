@@ -6,8 +6,8 @@ import Login from '../views/Login'
 import EmailRegistration from '../views/EmailRegistration'
 import AuthPage from '../views/AuthPage'
 import Gallery from '../views/Gallery'
-import NotFound from '../views/NotFound'
 import Onboarding from '../views/Onboarding.tsx'
+import NotFound from '../views/NotFound'
 
 import AuthContextProvider from '../contexts/AuthContextProvider'
 
@@ -45,12 +45,12 @@ const router = createBrowserRouter([
         ),
     },
     {
-        path: '*',
-        element: <NotFound />,
-    },
-    {
         path: '/onboarding',
         element: <Onboarding />,
+    },
+    {
+        path: '*',
+        element: <NotFound />,
     },
 ])
 
