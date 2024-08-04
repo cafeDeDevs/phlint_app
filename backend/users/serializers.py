@@ -5,7 +5,6 @@ from users.models import Albums, Networks, Photos, User
 logger = logging.getLogger(__name__)
 
 
-
 class EmailRegistrationSerializer(serializers.Serializer):
     email = serializers.EmailField()
 
@@ -35,7 +34,7 @@ class AlbumsSerializer(serializers.ModelSerializer):
         try:
             new_album = Albums(
                 title=data['title'],
-                s3_url=data['s3_url'],
+                album_name=data['album_name'],
                 is_private=data['is_private'],
                 user_id=data['user_id'],
             )
@@ -57,7 +56,7 @@ class PhotosSerializer(serializers.ModelSerializer):
         try:
             new_photo = Photos(
                 album_id=data['album_id'],
-                s3_url=data['s3_url'],
+                file_name=data['file_name'],
             )
             new_photo.save()
             return new_photo
