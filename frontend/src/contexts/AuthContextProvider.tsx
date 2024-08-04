@@ -28,8 +28,10 @@ export default function AuthContextProvider({ children }: Props) {
                         credentials: 'include',
                     },
                 )
-                if (!testRes.ok)
-                    throw new Error('Authentication Failed, Please Login')
+                const jsonRes = await testRes.json()
+                if (!testRes.ok) {
+                    throw new Error(jsonRes.message)
+                }
             } catch (err) {
                 console.error('ERROR :=>', err)
                 navigate('/')
