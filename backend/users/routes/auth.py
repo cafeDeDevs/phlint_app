@@ -101,7 +101,7 @@ def register_by_access_token(request, backend) -> Response:
                 # albums_data and photos_data and save via boto3
                 albums_data = {
                     'title': 'default_album',
-                    's3_url': 'https://fake_for_now.com',
+                    'album_name': f'{user}/default/',
                     'is_private': False,
                     'user_id': new_user.id
                 }
@@ -109,7 +109,7 @@ def register_by_access_token(request, backend) -> Response:
                 new_album = album_serializer.create_album(
                     data=albums_data)  #type:ignore
                 photos_data = {
-                    's3_url': 'https://fake_for_now.com',
+                    'file_name': 'default.jpg',
                     'album_id': new_album.id,
                 }
                 photo_serializer = PhotosSerializer(data=photos_data)
@@ -231,7 +231,9 @@ def login_by_access_token(request, backend) -> Response:
 
 @api_view(['POST'])
 @csrf_protect
-def authentication_test(request) -> Response:
+def authentication_test(request, backend) -> Response:
+    # TODO: Use backend variable to choose which auth logic to use
+    # if (backend == 'google-oauth2'): # above logic goes here
     if isinstance(request.user, AnonymousUser):
         logger.warning("User attempted to login as AnonymousUser")
         return Response(
@@ -243,6 +245,7 @@ def authentication_test(request) -> Response:
         {'message': "User successfully authenticated"},
         status=status.HTTP_200_OK,
     )
+    # elif (backend == 'email'):
 
 
 @api_view(['POST'])
