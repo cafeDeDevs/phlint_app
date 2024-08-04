@@ -18,6 +18,7 @@ const Gallery = () => {
                     import.meta.env.VITE_BACKEND_GALLERY_ROUTE,
                     {
                         method: 'GET',
+                        credentials: 'include',
                     },
                 )
                 if (!galleryRes.ok)
