@@ -1,7 +1,9 @@
 import { useGoogleLogin } from '@react-oauth/google'
 import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
+
 import { delay } from '../utils/'
+import urls from '../config/urls'
 
 const GoogleOAuthLoginBtn = () => {
     const navigate = useNavigate()
@@ -10,20 +12,17 @@ const GoogleOAuthLoginBtn = () => {
     const login = useGoogleLogin({
         onSuccess: async (tokenResponse): Promise<void> => {
             try {
-                const res = await fetch(
-                    import.meta.env.VITE_BACKEND_LOGIN_ROUTE,
-                    {
-                        method: 'POST',
-                        headers: {
-                            Accept: 'application/json',
-                            'Content-Type': 'application/json',
-                        },
-                        credentials: 'include',
-                        body: JSON.stringify({
-                            code: tokenResponse.code,
-                        }),
+                const res = await fetch(urls.BACKEND_LOGIN_ROUTE, {
+                    method: 'POST',
+                    headers: {
+                        Accept: 'application/json',
+                        'Content-Type': 'application/json',
                     },
-                )
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        code: tokenResponse.code,
+                    }),
+                })
                 if (!res.ok) {
                     const jsonRes = await res.json()
                     throw new Error(jsonRes.message)

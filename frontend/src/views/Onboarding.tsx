@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom'
 import { z } from 'zod'
 
 import { usernameSchema, passwordSchema } from '../utils/'
+import urls from '../config/urls'
 
 const Onboarding = () => {
     const [username, setUsername] = useState('')
@@ -53,16 +54,13 @@ const Onboarding = () => {
         }
 
         try {
-            const res = await fetch(
-                import.meta.env.VITE_BACKEND_ONBOARD_ROUTE,
-                {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ username, password, token }),
+            const res = await fetch(urls.BACKEND_ONBOARD_ROUTE, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
                 },
-            )
+                body: JSON.stringify({ username, password, token }),
+            })
 
             const jsonRes = await res.json()
             if (!res.ok) {

@@ -1,4 +1,5 @@
 import { type FC, useState, FormEvent } from 'react'
+import urls from '../config/urls'
 
 const EmailRegistrationForm: FC = () => {
     const [email, setEmail] = useState<string>('')
@@ -7,16 +8,13 @@ const EmailRegistrationForm: FC = () => {
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault()
         try {
-            const res = await fetch(
-                import.meta.env.VITE_BACKEND_EMAIL_REGISTRATION_ROUTE,
-                {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ email }),
+            const res = await fetch(urls.BACKEND_EMAIL_REGISTRATION_ROUTE, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
                 },
-            )
+                body: JSON.stringify({ email }),
+            })
             // TODO: Remove else clause and simply navigate('/onboarding')
             // NOTE: onboarding route not yet implemented
             if (!res.ok) {

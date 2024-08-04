@@ -1,7 +1,9 @@
 import { useGoogleLogin } from '@react-oauth/google'
 import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
+
 import { delay } from '../utils/'
+import urls from '../config/urls'
 
 // TODO: Add An Onboarding Process that asks the user to create a user_name and other info
 const GoogleOAuthSignupBtn = () => {
@@ -11,20 +13,17 @@ const GoogleOAuthSignupBtn = () => {
     const signup = useGoogleLogin({
         onSuccess: async (tokenResponse): Promise<void> => {
             try {
-                const res = await fetch(
-                    import.meta.env.VITE_BACKEND_REGISTRATION_ROUTE,
-                    {
-                        method: 'POST',
-                        headers: {
-                            Accept: 'application/json',
-                            'Content-Type': 'application/json',
-                        },
-                        credentials: 'include',
-                        body: JSON.stringify({
-                            code: tokenResponse.code,
-                        }),
+                const res = await fetch(urls.BACKEND_REGISTRATION_ROUTE, {
+                    method: 'POST',
+                    headers: {
+                        Accept: 'application/json',
+                        'Content-Type': 'application/json',
                     },
-                )
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        code: tokenResponse.code,
+                    }),
+                })
                 if (!res.ok) throw new Error('Error While Authenticating User!')
                 navigate('/auth')
             } catch (err) {

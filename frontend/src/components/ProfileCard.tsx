@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 
 import { delay } from '../utils/'
+import urls from '../config/urls'
 
 const ProfileCard = () => {
     const navigate = useNavigate()
@@ -11,7 +12,7 @@ const ProfileCard = () => {
 
     const logout = async () => {
         try {
-            const res = await fetch(import.meta.env.VITE_BACKEND_LOGOUT_ROUTE, {
+            const res = await fetch(urls.BACKEND_LOGOUT_ROUTE, {
                 method: 'POST',
                 headers: {
                     Accept: 'application/json',

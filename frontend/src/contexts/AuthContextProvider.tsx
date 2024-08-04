@@ -3,6 +3,7 @@ import { AuthContext } from './AuthContext'
 import { useNavigate } from 'react-router-dom'
 
 import { grabStoredCookie } from '../utils/'
+import urls from '../config/urls'
 
 interface Props {
     children?: ReactNode
@@ -16,18 +17,15 @@ export default function AuthContextProvider({ children }: Props) {
         const authenticate = async () => {
             const csrfToken = grabStoredCookie('csrftoken')
             try {
-                const testRes = await fetch(
-                    import.meta.env.VITE_BACKEND_TEST_ROUTE,
-                    {
-                        method: 'POST',
-                        headers: {
-                            Accept: 'application/json',
-                            'Content-Type': 'application/json',
-                            'X-CSRFToken': csrfToken,
-                        },
-                        credentials: 'include',
+                const testRes = await fetch(urls.BACKEND_TEST_ROUTE, {
+                    method: 'POST',
+                    headers: {
+                        Accept: 'application/json',
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken,
                     },
-                )
+                    credentials: 'include',
+                })
                 const jsonRes = await testRes.json()
                 if (!testRes.ok) {
                     throw new Error(jsonRes.message)

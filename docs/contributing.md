@@ -280,13 +280,13 @@ Or on the frontend, there is a slight difference in that in using
 using the `VITE_` syntax:
 
 ```
-VITE_BACKEND_TEST_ROUTE=http://localhost:8000/api/test/
+VITE_SECRET_KEY=Jk8LaCECLHxLEPCZ6Ltyg
 ```
 
 And then imported like so:
 
 ```typescript
-const testRoute = import.meta.env.VITE_BACKEND_TEST_ROUTE;
+const secretKey = import.meta.env.VITE_SECRET_KEY;
 ```
 
 Great! We now have secrets defined in our environment variables, and because the

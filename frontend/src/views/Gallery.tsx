@@ -4,6 +4,8 @@ import '../App.css'
 import { useEffect, useState } from 'react'
 import Navbar from '../components/Navbar'
 
+import urls from '../config/urls'
+
 /* TODO: Display Spinner Animation While User Waits for Images To Load */
 /* TODO: Cache Around 20 Images Client Side Before Asking For More From Server */
 /* TODO: Implement Intersection Observer Pattern whereby more images are loaded as user scrolls page */
@@ -14,13 +16,10 @@ const Gallery = () => {
     useEffect(() => {
         const grabGallery = async (): Promise<void> => {
             try {
-                const galleryRes = await fetch(
-                    import.meta.env.VITE_BACKEND_GALLERY_ROUTE,
-                    {
-                        method: 'GET',
-                        credentials: 'include',
-                    },
-                )
+                const galleryRes = await fetch(urls.BACKEND_GALLERY_ROUTE, {
+                    method: 'GET',
+                    credentials: 'include',
+                })
                 if (!galleryRes.ok)
                     throw new Error(
                         'An Error Occurred While Trying To Retrieve Your Gallery',
