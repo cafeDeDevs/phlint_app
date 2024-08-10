@@ -21,6 +21,7 @@ from social_django.utils import psa
 from users.serializers import *
 from users.utils.auth_utils import *
 
+from rest_framework_simplejwt.tokens import RefreshToken
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -301,6 +302,7 @@ def activate(request) -> Response:
 
         if user_serializer.is_valid():
             user_serializer.save()
+            user = user_serializer.instance # Get created user 
         else:
             return Response(
                 {
@@ -317,10 +319,23 @@ def activate(request) -> Response:
         decrypted_password = decrypt(encrypted_password, settings.SECRET_KEY)
         print(f"Decrypted password: {decrypted_password}")
 
-        return Response(
-            {'message': "User activated successfully"},
+        # Generate Tokens 
+        refresh = RefreshToken.for_user(user)
+        access_token = str(refresh.access_token)
+        refresh_token = str(refresh)
+
+        # return Response(
+        #     {'message': "User activated successfully"},
+        #     status=status.HTTP_200_OK,
+        # )
+        res = Response(
+            {'message': 'User actived successfully'},
             status=status.HTTP_200_OK,
         )
+
+        res = set_authentication_cookies(res, access_token, refresh_token, request)
+        # Logic to Login User goes here     
+        return res
 
     except Exception as e:
         logger.error(
