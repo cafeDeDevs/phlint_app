@@ -13,6 +13,9 @@ import os
 
 from dotenv import load_dotenv
 
+from datetime import timedelta
+
+
 load_dotenv()
 
 from pathlib import Path
@@ -262,3 +265,12 @@ EMAIL_PORT = os.getenv('EMAIL_PORT')
 # TODO: Change Email Host User to official Phlint Email Account
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+
+
+# Setting Time for Simple JWTs
+SIMPLE_JWT = {
+    #! For testing only
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=1),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+
+}
