@@ -334,7 +334,8 @@ def activate(request) -> Response:
         )
 
         res = set_authentication_cookies(res, access_token, refresh_token, request)
-        # Logic to Login User goes here     
+
+        # login(request, user)        
         return res
 
     except Exception as e:
