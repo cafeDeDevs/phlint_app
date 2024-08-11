@@ -10,6 +10,8 @@ from rest_framework.response import Response
 from users.utils.s3_utils import *
 
 
+# TODO: denote if user is trying to get default gallery (initial sign in)
+# or is trying to get specified gallery (should be in request and/or url)
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_gallery_test(request, backend) -> Response:
@@ -18,23 +20,23 @@ def get_gallery_test(request, backend) -> Response:
     # we'll need Google OAuth Signup/Onboarding to do this
     s3_client = boto3.client('s3')
     try:
-        file_list = grab_file_list()
+        # NOTE: Creates New Bucket By User Name (i.e. email),
+        # simply errors silently if bucket already exists
+        create_bucket(str(request.user))
+        bucket_name = str(request.user)
+        file_list = grab_file_list(bucket_name)
         image_files = []
 
-        # TODO: Don't rely on this, refactor to create new buckets instead of directories
+        # TODO: Establish for every image a thumbnail/mobile/desktop/full version of each image
+        # NOTE: If there's nothing in the user's bucket yet,
+        # establishes a default gallery(directory) in bucket and uploads a default image
         if len(file_list) == 0:
-            upload_file('./users/assets/default.jpg', 'phlint-app-s3-test',
-                        'default.jpg')
+            upload_file('./users/assets/default.jpg', bucket_name,
+                        'default/default.jpg')
 
         for file in file_list:
-            # NOTE: Creates a default album/file if first time seeing gallery
-            if f'{request.user}/default/' not in file:
-                upload_file('./users/assets/default.jpg', 'phlint-app-s3-test',
-                            f'{request.user}/default/default.jpg')
-        for file in file_list:
-            if f'{request.user}/default/' in file:
-                file_obj = s3_client.get_object(Bucket='phlint-app-s3-test',
-                                                Key=file)
+            if 'default/' in file:
+                file_obj = s3_client.get_object(Bucket=bucket_name, Key=file)
                 image_data = base64.b64encode(
                     file_obj['Body'].read()).decode('utf-8')
                 image_files.append(image_data)
