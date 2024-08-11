@@ -11,12 +11,15 @@ from time import time
 from django.conf import settings
 from django.middleware.csrf import get_token
 
+from rest_framework.response import Response
+
 from Cryptodome.Cipher import AES
 from Cryptodome.Random import get_random_bytes
 
 
 # NOTE: Helper function for setting cookies (consider moving into separate file/Class)
-def set_authentication_cookies(response, access_token, refresh_token, request):
+def set_authentication_cookies(response, access_token, refresh_token,
+                               request) -> Response:
     response.set_cookie(
         key='access_token',
         value=access_token,
@@ -38,7 +41,7 @@ def set_authentication_cookies(response, access_token, refresh_token, request):
     return response
 
 
-def remove_authenticated_cookies(response):
+def remove_authenticated_cookies(response) -> Response:
     response.delete_cookie('access_token')
     response.delete_cookie('refresh_token')
     response.delete_cookie('csrftoken')
@@ -46,7 +49,7 @@ def remove_authenticated_cookies(response):
     return response
 
 
-def generate_sha256_hash(email):
+def generate_sha256_hash(email) -> str:
     secret_key = os.urandom(32)
     timestamp = str(int(time())).encode('utf-8')
     message = email.encode('utf-8') + timestamp
@@ -57,7 +60,7 @@ def generate_sha256_hash(email):
 
 # AES Encryption/Decryption Algorithms from boot.dev
 # https://blog.boot.dev/cryptography/aes-256-cipher-python-cryptography-examples/
-def encrypt(plain_text, password):
+def encrypt(plain_text, password) -> str:
     # generate a random salt
     salt = get_random_bytes(AES.block_size)
 
@@ -84,7 +87,7 @@ def encrypt(plain_text, password):
     return encrypted_data
 
 
-def decrypt(encrypted_data, password):
+def decrypt(encrypted_data, password) -> str:
     # split the string back into its components
     salt, cipher_text, nonce, tag = encrypted_data.split('::')
 
