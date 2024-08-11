@@ -17,4 +17,6 @@ urlpatterns = [
             get_gallery_test),
     path('api/email-registration/', email_registration_view),
     path('api/activate/', activate, name='activate'),
+    re_path('api/upload-gallery-test/' + r'social/(?P<backend>[^/]+)/$',
+            upload_gallery_test)
 ]

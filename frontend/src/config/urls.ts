@@ -9,6 +9,8 @@ export default {
         'http://localhost:8000/api/authentication-test/social/google-oauth2/',
     BACKEND_GALLERY_ROUTE:
         'http://localhost:8000/api/get-gallery-test/social/google-oauth2/',
+    BACKEND_UPLOAD_IMAGE_ROUTE:
+        'http://localhost:8000/api/upload-gallery-test/social/google-oauth2/',
     BACKEND_EMAIL_REGISTRATION_ROUTE:
         'http://localhost:8000/api/email-registration/',
     BACKEND_ONBOARD_ROUTE: 'http://localhost:8000/api/activate/',
