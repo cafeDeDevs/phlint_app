@@ -15,3 +15,8 @@
 .gallery {
     padding-top: 3.5em;
 }
+
+.file-picker {
+    display: none;
+    color: transparent;
+}
