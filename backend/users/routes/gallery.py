@@ -32,7 +32,7 @@ def get_gallery_test(request, backend) -> Response:
         # establishes a default gallery(directory) in bucket and uploads a default image
         if len(file_list) == 0:
             upload_file('./users/assets/default.jpg', bucket_name,
-                        'default/default.jpg')
+                        'default.jpg')
 
         for file in file_list:
             if 'default/' in file:
@@ -57,5 +57,41 @@ def get_gallery_test(request, backend) -> Response:
             {
                 'message':
                 'An Error Occurred While Trying To Retrieve Your Gallery'
+            },
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def upload_gallery_test(request, backend) -> Response:
+    try:
+        if not request.FILES:
+            return Response({'message': 'No file provided.'},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        # Get the first file from the request
+        uploaded_file = next(iter(request.FILES.values()))
+        bucket_name = str(request.user)
+        # NOTE: Because we don't provide an option_name, the
+        # file is uploaded directly to s3 without having to save it on our server
+        # NOTE: Also, because we don't provide a gallery_name, it puts the image in default
+        # TODO: Use gallery_name argument once establishing different galleries
+        success = upload_file(uploaded_file, bucket_name)
+
+        if not success:
+            return Response(
+                {'message': f'Failed to upload {uploaded_file.name} to S3.'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response({
+            'message': 'Images Uploaded to S3 Successfully',
+        },
+                        status=status.HTTP_200_OK)
+    except Exception as e:
+        logging.error(e)
+        return Response(
+            {
+                'message':
+                'An Error Occurred While Trying To Upload Image to S3'
             },
             status=status.HTTP_500_INTERNAL_SERVER_ERROR)
