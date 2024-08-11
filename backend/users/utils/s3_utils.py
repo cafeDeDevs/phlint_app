@@ -33,7 +33,6 @@ def delete_bucket(bucket) -> bool:
     return True
 
 
-# TODO: add bucket parameter/argument
 def grab_file_list(bucket) -> List[str]:
     try:
         file_list = []
