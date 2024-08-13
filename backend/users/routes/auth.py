@@ -404,7 +404,6 @@ def authentication_test(request, backend) -> Response:
         )
 
     else:
-        # Handle any other backends or throw an error
         logger.warning("Authentication attempted with unsupported backend: %s", backend)
         return Response(
             {"message": "Unsupported authentication method."},
