@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { z } from 'zod'
 
-import { usernameSchema, passwordSchema } from '../utils/'
+import { delay, usernameSchema, passwordSchema } from '../utils/'
 import urls from '../config/urls'
 
 const Onboarding = () => {
@@ -13,6 +13,7 @@ const Onboarding = () => {
     const [success, setSuccess] = useState('')
 
     const location = useLocation()
+    const navigate = useNavigate()
 
     const queryParams = new URLSearchParams(location.search)
     const token = queryParams.get('token')
@@ -57,8 +58,10 @@ const Onboarding = () => {
             const res = await fetch(urls.BACKEND_ONBOARD_ROUTE, {
                 method: 'POST',
                 headers: {
+                    Accept: 'application/json',
                     'Content-Type': 'application/json',
                 },
+                credentials: 'include',
                 body: JSON.stringify({ username, password, token }),
             })
 
@@ -67,6 +70,8 @@ const Onboarding = () => {
                 throw new Error(jsonRes.message || 'Server error')
             }
             setSuccess(jsonRes.message)
+            await delay(3000)
+            navigate('/gallery')
         } catch (err) {
             const error = err as Error
             setError(error.message)
