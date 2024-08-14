@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { z } from 'zod'
 
@@ -17,6 +17,34 @@ const Onboarding = () => {
 
     const queryParams = new URLSearchParams(location.search)
     const token = queryParams.get('token')
+
+    useEffect(() => {
+        if (!token) {
+            navigate('/')
+            return
+        }
+        (async () => {
+            try {
+                const res = await fetch(urls.BACKEND_CHECK_TOKEN_ROUTE, {
+                    method: 'POST',
+                    headers: {
+                        Accept: 'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({ "token": token }),
+                })
+                const jsonRes = await res.json()
+                if (!res.ok) throw new Error(jsonRes.message)
+            } catch (err) {
+                const error = err as Error
+                setError(error.message)
+                await delay(3000)
+                navigate('/')
+                throw new Error(error.message)
+            }
+        })()
+    }, [token, navigate])
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -64,14 +92,12 @@ const Onboarding = () => {
                 credentials: 'include',
                 body: JSON.stringify({ username, password, token }),
             })
-
             const jsonRes = await res.json()
-            if (!res.ok) {
-                throw new Error(jsonRes.message || 'Server error')
-            }
+            if (!res.ok) throw new Error(jsonRes.message)
             setSuccess(jsonRes.message)
             await delay(3000)
             navigate('/gallery')
+            return
         } catch (err) {
             const error = err as Error
             setError(error.message)
@@ -80,41 +106,47 @@ const Onboarding = () => {
     }
 
     return (
-        <div>
-            <h2>Complete Your Registration</h2>
-            <form onSubmit={handleSubmit}>
+        <>
+            {!error &&
                 <div>
-                    <label>Username:</label>
-                    <input
-                        type='text'
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        required
-                    />
+                    <h2>Complete Your Registration</h2>
+                    <form onSubmit={handleSubmit}>
+                        <div>
+                            <label>Username:</label>
+                            <input
+                                type='text'
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label>Password:</label>
+                            <input
+                                type='password'
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label>Confirm Password:</label>
+                            <input
+                                type='password'
+                                value={confirmPassword}
+                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                required
+                            />
+                        </div>
+                        <button type='submit'>Complete Registration</button>
+                    </form>
                 </div>
-                <div>
-                    <label>Password:</label>
-                    <input
-                        type='password'
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                    />
-                </div>
-                <div>
-                    <label>Confirm Password:</label>
-                    <input
-                        type='password'
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        required
-                    />
-                </div>
+            }
+            <div>
                 {error && <p style={{ color: 'red' }}>{error}</p>}
                 {success && <p style={{ color: 'green' }}>{success}</p>}
-                <button type='submit'>Complete Registration</button>
-            </form>
-        </div>
+            </div>
+        </>
     )
 }
 

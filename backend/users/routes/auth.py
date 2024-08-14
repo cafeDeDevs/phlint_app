@@ -229,8 +229,8 @@ def login_by_access_token(request, backend) -> Response:
 @csrf_protect
 @psa()
 def authentication_test(request, backend) -> Response:
-    access_token = request.COOKIES.get("access_token")
     try:
+        access_token = request.COOKIES.get("access_token")
         if isinstance(request.user, User):
             AccessToken(access_token)
             return Response(
@@ -263,6 +263,29 @@ def authentication_test(request, backend) -> Response:
                     "message": "Unauthorized: User failed all other authentication checks"
                 },
                 status=status.HTTP_401_UNAUTHORIZED,
+            )
+    except Exception as e:
+        logger.error("%s Uncaught Exception Error:", str(e))
+        return Response(
+            {"message": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def check_token_hash(request) -> Response:
+    try:
+        token_str = request.data.get("token")
+        email = redis_instance.get(f"signup_token_for_{token_str}")
+        if not email:
+            logger.error(f"Token not found or expired: {token_str}")
+            return Response(
+                {"message": "Invalid token"},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+        else:
+            return Response(
+                {"message": "Token is Validated"}, status=status.HTTP_200_OK
             )
     except Exception as e:
         logger.error("%s Uncaught Exception Error:", str(e))
