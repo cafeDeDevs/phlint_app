@@ -4,15 +4,13 @@
 import jwt
 import requests
 from django.conf import settings
-from django.contrib.auth import login
-from django.contrib.auth import logout as django_logout
+from django.contrib.auth import login, logout
 from django.contrib.auth.models import AnonymousUser
 from django.core.mail import send_mail
 from django.views.decorators.csrf import csrf_protect
 from rest_framework import status
-from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
 from social_django.utils import psa
@@ -22,15 +20,15 @@ from users.utils.auth_utils import *
 
 
 @api_view(["POST"])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def logout_view(request, backend) -> Response:
     try:
         response = Response(
-            {"message": "User logged out successfully"}, status=status.HTTP_200_OK
+            {"message": "User logged out successfully"},
+            status=status.HTTP_200_OK,
         )
-        remove_authenticated_cookies(response)
-        Token.objects.filter(user=request.user).delete()  # type:ignore
-        django_logout(request)
+        remove_authentication_cookies(response)
+        logout(request)
         return response
     except Exception as e:
         logger.error("Logout error: %s", str(e))
@@ -45,7 +43,7 @@ def register_by_access_token(request, backend) -> Response:
     if not code:
         logger.warning("Request does not have OAuth code")
         return Response(
-            {"error": "No OAuth code provided."}, status=status.HTTP_400_BAD_REQUEST
+            {"error": "No OAuth code provided."}, status=status.HTTP_401_UNAUTHORIZED
         )
 
     try:
@@ -126,7 +124,7 @@ def register_by_access_token(request, backend) -> Response:
                     "access_token": access_token,
                     "refresh_token": refresh_token,
                 },
-                status=status.HTTP_200_OK,
+                status=status.HTTP_201_CREATED,
             )
             res = set_authentication_cookies(res, access_token, refresh_token, request)
 
@@ -136,7 +134,7 @@ def register_by_access_token(request, backend) -> Response:
             logger.warning("python social auth unable to authenticate user")
             return Response(
                 {"error": "User Not Found By OAuth Code"},
-                status=status.HTTP_400_BAD_REQUEST,
+                status=status.HTTP_401_UNAUTHORIZED,
             )
 
     except Exception as e:
@@ -152,7 +150,7 @@ def login_by_access_token(request, backend) -> Response:
     if not code:
         logger.warning("Request does not have OAuth code")
         return Response(
-            {"error": "No OAuth code provided."}, status=status.HTTP_400_BAD_REQUEST
+            {"error": "No OAuth code provided."}, status=status.HTTP_401_UNAUTHORIZED
         )
     try:
         token_url = "https://www.googleapis.com/oauth2/v4/token"
@@ -352,7 +350,7 @@ def activate(request) -> Response:
         else:
             return Response(
                 {"message": "User Credentials are not Valid via activate serializer"},
-                status=status.HTTP_406_NOT_ACCEPTABLE,
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         redis_instance.delete(f"signup_token_for_{token_str}")
@@ -372,8 +370,6 @@ def activate(request) -> Response:
         )
 
         res = set_authentication_cookies(res, access_token, refresh_token, request)
-        # TODO: Alternative Auth Strategy: see /users/auth.py
-        # NOTE: Puts user in users_user table :)
         login(request, user, backend="users.auth.CookieTokenAuthentication")
         return res
 

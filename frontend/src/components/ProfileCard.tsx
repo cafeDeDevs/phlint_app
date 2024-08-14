@@ -2,21 +2,23 @@ import '../css/ProfileCard.css'
 import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 
-import { delay } from '../utils/'
+import { delay, grabStoredCookie } from '../utils/'
 import urls from '../config/urls'
 
 const ProfileCard = () => {
     const navigate = useNavigate()
-    const [errorMsg, setErrorMsg] = useState<string | null>(null)
-    const [successMsg, setSuccessMsg] = useState<string | null>(null)
+    const [errorMsg, setErrorMsg] = useState < string | null > (null)
+    const [successMsg, setSuccessMsg] = useState < string | null > (null)
 
     const logout = async () => {
+        const csrfToken = grabStoredCookie('csrftoken')
         try {
             const res = await fetch(urls.BACKEND_LOGOUT_ROUTE, {
                 method: 'POST',
                 headers: {
                     Accept: 'application/json',
                     'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken,
                 },
                 credentials: 'include',
             })
