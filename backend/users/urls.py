@@ -20,4 +20,8 @@ urlpatterns = [
     re_path("api/get-gallery-test/" + r"social/(?P<backend>[^/]+)/$", get_gallery_test),
     path("api/email-registration/", email_registration_view),
     path("api/activate/", activate, name="activate"),
+    path(
+        "api/check-token-hash/",
+        check_token_hash,
+    ),
 ]
