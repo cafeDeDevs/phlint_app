@@ -234,27 +234,35 @@ def authentication_test(request, backend) -> Response:
         if isinstance(request.user, User):
             AccessToken(access_token)
             return Response(
-                {"message": "User successfully authenticated using Email/JWT Auth"},
+                {
+                    "message": "Authorized: User successfully authenticated using Email/JWT Auth"
+                },
                 status=status.HTTP_200_OK,
             )
         elif request.backend.do_auth(access_token):
             user = request.backend.do_auth(access_token)
             if user:
                 return Response(
-                    {"message": "User successfully authenticated using Google OAuth"},
+                    {
+                        "message": "Authorized: User successfully authenticated using Google OAuth"
+                    },
                     status=status.HTTP_200_OK,
                 )
         elif isinstance(request.user, AnonymousUser):
             logger.warning("User Attempted To Login As AnonymousUser")
             return Response(
-                {"message": "Anonymous User Login Detected"},
+                {"message": "Unauthorized: Anonymous User Login Detected"},
                 status=status.HTTP_401_UNAUTHORIZED,
             )
         else:
-            logger.info("%s successfully authenticated", request.user)
+            logger.warning(
+                "User %s failed all other authentiction checks", request.user
+            )
             return Response(
-                {"message": "User successfully authenticated using Google Oauth"},
-                status=status.HTTP_200_OK,
+                {
+                    "message": "Unauthorized: User failed all other authentication checks"
+                },
+                status=status.HTTP_401_UNAUTHORIZED,
             )
     except Exception as e:
         logger.error("%s Uncaught Exception Error:", str(e))
