@@ -31,7 +31,6 @@ const Onboarding = () => {
                         Accept: 'application/json',
                         'Content-Type': 'application/json',
                     },
-                    credentials: 'include',
                     body: JSON.stringify({ "token": token }),
                 })
                 const jsonRes = await res.json()
