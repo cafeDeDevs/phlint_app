@@ -10,6 +10,7 @@ const Onboarding = () => {
     const [password, setPassword] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
     const [error, setError] = useState('')
+    const [checkHashError, setCheckHashError] = useState('')
     const [success, setSuccess] = useState('')
 
     const location = useLocation()
@@ -37,7 +38,7 @@ const Onboarding = () => {
                 if (!res.ok) throw new Error(jsonRes.message)
             } catch (err) {
                 const error = err as Error
-                setError(error.message)
+                setCheckHashError(error.message)
                 await delay(3000)
                 navigate('/')
                 throw new Error(error.message)
@@ -106,7 +107,7 @@ const Onboarding = () => {
 
     return (
         <>
-            {!error &&
+            {!checkHashError &&
                 <div>
                     <h2>Complete Your Registration</h2>
                     <form onSubmit={handleSubmit}>
