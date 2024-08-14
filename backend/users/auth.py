@@ -1,21 +1,34 @@
-from django.conf import settings
-from django.contrib.auth.models import User
-
 from rest_framework.authentication import BaseAuthentication
 from rest_framework.exceptions import AuthenticationFailed
-from rest_framework.authtoken.models import Token
+from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
+from users.models import User
+from users.utils.auth_utils import *
 
 
 class CookieTokenAuthentication(BaseAuthentication):
     # TODO: Add more logic regarding refresh_token
     def authenticate(self, request):
-        token_key = request.COOKIES.get('access_token')
-        if not token_key:
+        access_token = request.COOKIES.get("access_token")
+        #  refresh_token = request.COOKIES.get("refresh_token")
+        if not access_token:
             return None
 
         try:
-            token = Token.objects.get(key=token_key)  # type: ignore
-        except Token.DoesNotExist:  # type: ignore
-            raise AuthenticationFailed('Invalid token')
+            if access_token.count(".") == 2:
+                payload = AccessToken(access_token).payload
+                user_id = payload.get("user_id")
+                user = self.get_user(user_id)
+                if user:
+                    return (user, access_token)
+            else:
+                return None
+        except Exception as e:
+            logger.error("Authentication error: %s", str(e))
+            raise AuthenticationFailed("Invalid token")
 
-        return (token.user, token)
+    def get_user(self, user_id):
+        try:
+            return User.objects.get(pk=user_id)
+        except Exception as e:
+            logger.error("Error getting User by id: %s", str(e))
+            return None
