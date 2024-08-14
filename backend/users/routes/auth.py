@@ -238,14 +238,12 @@ def authentication_test(request, backend) -> Response:
                 status=status.HTTP_200_OK,
             )
         elif request.backend.do_auth(access_token):
-            user = request.backend.do_auth(access_token)
-            if user:
-                return Response(
-                    {
-                        "message": "Authorized: User successfully authenticated using Google OAuth"
-                    },
-                    status=status.HTTP_200_OK,
-                )
+            return Response(
+                {
+                    "message": "Authorized: User successfully authenticated using Google OAuth2"
+                },
+                status=status.HTTP_200_OK,
+            )
         elif isinstance(request.user, AnonymousUser):
             logger.warning("User Attempted To Login As AnonymousUser")
             return Response(
