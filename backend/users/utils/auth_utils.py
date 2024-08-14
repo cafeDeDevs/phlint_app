@@ -14,7 +14,6 @@ from django.middleware.csrf import get_token
 from rest_framework.response import Response
 
 
-# NOTE: Helper function for setting cookies (consider moving into separate file/Class)
 def set_authentication_cookies(
     response, access_token, refresh_token, request
 ) -> Response:
@@ -39,7 +38,7 @@ def set_authentication_cookies(
     return response
 
 
-def remove_authenticated_cookies(response) -> Response:
+def remove_authentication_cookies(response) -> Response:
     response.delete_cookie("access_token")
     response.delete_cookie("refresh_token")
     response.delete_cookie("csrftoken")
