@@ -7,6 +7,7 @@ class User(models.Model):
     user_password = models.CharField(max_length=254, null=True)
     user_email = models.EmailField(max_length=254, null=True)
     is_active = models.BooleanField(False, null=True)
+    last_login = models.DateTimeField(auto_now=True)
     objects = models.Manager()
 
 

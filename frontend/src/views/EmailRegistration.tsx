@@ -2,8 +2,8 @@ import { type FC, useState, FormEvent } from 'react'
 import urls from '../config/urls'
 
 const EmailRegistrationForm: FC = () => {
-    const [email, setEmail] = useState<string>('')
-    const [message, setMessage] = useState<string>('')
+    const [email, setEmail] = useState < string > ('')
+    const [message, setMessage] = useState < string > ('')
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault()
