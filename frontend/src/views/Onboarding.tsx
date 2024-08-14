@@ -34,8 +34,11 @@ const Onboarding = () => {
                     },
                     body: JSON.stringify({ "token": token }),
                 })
-                const jsonRes = await res.json()
-                if (!res.ok) throw new Error(jsonRes.message)
+                if (!res.ok) {
+                    const jsonRes = await res.json()
+                    console.log('jsonRes :=>', jsonRes)
+                    throw new Error(jsonRes.message)
+                }
             } catch (err) {
                 const error = err as Error
                 setCheckHashError(error.message)

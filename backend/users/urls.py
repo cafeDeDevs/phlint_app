@@ -18,6 +18,9 @@ urlpatterns = [
         "api/authentication-test/" + r"social/(?P<backend>[^/]+)/$", authentication_test
     ),
     re_path("api/get-gallery-test/" + r"social/(?P<backend>[^/]+)/$", get_gallery_test),
+    re_path(
+        "api/upload-gallery-test/" + r"social/(?P<backend>[^/]+)/$", upload_gallery_test
+    ),
     path("api/email-registration/", email_registration_view),
     path("api/activate/", activate, name="activate"),
     path(

@@ -10,11 +10,11 @@ import urls from '../config/urls'
 /* TODO: Cache Around 20 Images Client Side Before Asking For More From Server */
 /* TODO: Implement Intersection Observer Pattern whereby more images are loaded as user scrolls page */
 const Gallery = () => {
-    const [files, setFiles] = useState<File[]>([])
-    const [errorMsg, setErrorMsg] = useState<string | null>(null)
-    const [images, setImages] = useState<string[]>([])
-    const inputRef = useRef<HTMLInputElement | null>(null)
-    const [galleryUpdated, setGalleryUpdated] = useState<boolean>(false)
+    const [files, setFiles] = useState < File[] > ([])
+    const [errorMsg, setErrorMsg] = useState < string | null > (null)
+    const [images, setImages] = useState < string[] > ([])
+    const inputRef = useRef < HTMLInputElement | null > (null)
+    const [galleryUpdated, setGalleryUpdated] = useState < boolean > (false)
 
     useEffect(() => {
         const grabGallery = async (): Promise<void> => {
@@ -55,8 +55,10 @@ const Gallery = () => {
                         body: imageData,
                     },
                 )
-                const jsonRes = await uploadImageRes.json()
-                if (!uploadImageRes.ok) throw new Error(jsonRes.message)
+                if (!uploadImageRes.ok) {
+                    const jsonRes = await uploadImageRes.json()
+                    throw new Error(jsonRes.message)
+                }
                 setGalleryUpdated((prev) => !prev)
             } catch (err) {
                 if (err instanceof Error) {
