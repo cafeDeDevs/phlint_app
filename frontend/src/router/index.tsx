@@ -8,6 +8,7 @@ import AuthPage from '../views/AuthPage'
 import Gallery from '../views/Gallery'
 import Onboarding from '../views/Onboarding.tsx'
 import NotFound from '../views/NotFound'
+import EmailLogin from '../views/EmailLogin.tsx'
 
 import AuthContextProvider from '../contexts/AuthContextProvider'
 
@@ -27,6 +28,10 @@ const router = createBrowserRouter([
     {
         path: '/email-registration',
         element: <EmailRegistration />,
+    },
+    {
+        path: '/email-login',
+        element: <EmailLogin />,
     },
     {
         path: '/auth',
