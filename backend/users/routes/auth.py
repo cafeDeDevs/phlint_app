@@ -436,3 +436,4 @@ def email_registration_view(request) -> Response:
         return Response(
             {"message": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
+

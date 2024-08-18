@@ -15,4 +15,6 @@ export default {
         'http://localhost:8000/api/email-registration/',
     BACKEND_ONBOARD_ROUTE: 'http://localhost:8000/api/activate/',
     BACKEND_CHECK_TOKEN_ROUTE: 'http://localhost:8000/api/check-token-hash/',
+    // TODO: Add to BE
+    BACKEND_EMAIL_LOGIN_ROUTE: 'http://localhost:8000/api/email-login/',
 }
