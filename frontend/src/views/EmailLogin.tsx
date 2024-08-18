@@ -13,14 +13,7 @@ const EmailLogin: React.FC = () => {
 
     return (
         <>
-            <div
-                style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    height: '100vh',
-                }}>
+            <div>
                 <h1>Login With Email!</h1>
                 <form
                     onSubmit={handleSubmit}
