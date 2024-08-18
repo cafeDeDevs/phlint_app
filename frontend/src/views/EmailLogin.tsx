@@ -41,7 +41,6 @@ const EmailLogin: React.FC = () => {
             } else {
                 const jsonRes = await res.json()
                 setMessage(jsonRes.message)
-                // store tokens here
             }
         } catch (err) {
             const error = err as Error
