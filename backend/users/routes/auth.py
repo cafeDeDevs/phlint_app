@@ -1,7 +1,6 @@
 # TODO: Refactor so that repeated declarations
 # and logic is abstracted as dicts, lists, or helper funcs
 # TODO: Remove all #type:ignore using proper type checking
-import jwt
 import requests
 from django.conf import settings
 from django.contrib.auth import login, logout
@@ -437,3 +436,70 @@ def email_registration_view(request) -> Response:
             {"message": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
 
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def login_by_jwt(requeset) -> Response:
+
+    email = request.data.get("email")
+    input_password = request.data.get("password")
+
+    try:
+        serializer = UserSerializer()
+        user = serializer.get_user_by_email(email)
+
+        if user is not None:
+            encrypted_password = user.password 
+
+            try:
+                decrpyed_password = decrypt(encrypted_password, input_password)
+            except Exception as e:
+                logger.error(f"Error during ecnryption: {str(e)}")
+                return Response({'error': 'Invalid email or password'}, status=status.HTTP_401_UNAUTHORIZED)
+            
+            if decrpyed_password == input_password:
+                refresh = RefreshToken.for_user(user)
+                return Response({
+                    'refresh': str(refresh),
+                    'access': str(refresh.access_token),
+                }, status=status.HTTP_200_OK)
+            else:
+                return Response({'error': 'Invalid email or password'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    except User.DoesNotExist:
+        return Response({'error': 'Invalid email or password'}, status=status.HTTP_401_UNAUTHORIZED)
+    except Exception as e:
+        logger.error(f"Unexpected error: {str(e)}")
+        return Response({'error': 'An error occurred: {}'.format(str(e))}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+    #* does user exist in DB (check by email)
+
+    #* this logic probably exists within serializers (get user by email)
+    #* import this from serializers to check
+    #* declare user serializer, user =  user_serlaizer.get_user_by_email)email)
+    #* validate
+    #
+    # auth utils (we need to decrtpy) 
+    # grab user . password and decrypt if the user is valid 
+        # check the password from the database to the `password = request.data.get('password')`
+        # if these match they are authenticated 
+        # IF OK, ISSUE THEM ACCESS_TOKENS
+
+
+        # Generate Tokens
+        # FROM THE SIMPLE JWT LIBRARY 
+        # refresh = RefreshToken.for_user(user)
+        # access_token = str(refresh.access_token)
+        # refresh_token = str(refresh)  
+        # set_cookies()
+            # since this is on FE, user doesn't have any cookies 
+
+        # ON FE: NAVIGATE TO GALLERY 
+        #?!@ how do we get the info from FE 
+
+        #? auth_utils.py = use the regex logic to check to make
+        #? sure things check out
+
+
+    # user = authenticate(username=email, password=password)

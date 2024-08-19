@@ -19,8 +19,6 @@ const EmailLogin: React.FC = () => {
         const validationRes = emailSchema.safeParse({ email })
 
         if (!validationRes.success) {
-            // Simple way of handling errors with Zod; we can implement more complex
-            // logic if we need to display all errors, but this will display the first one
             setMessage(validationRes.error.errors[0].message)
             return
         }
