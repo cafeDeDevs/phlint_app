@@ -443,6 +443,9 @@ def login_by_jwt(requeset) -> Response:
     email = request.data.get("email")
     input_password = request.data.get("password")
 
+    if email is None or input_password is None:
+        return Response({'error': 'Please provide both email and password'}, status=status.HTTP_400_BAD_REQUEST)
+
     try:
         serializer = UserSerializer()
         user = serializer.get_user_by_email(email)
@@ -453,7 +456,7 @@ def login_by_jwt(requeset) -> Response:
             try:
                 decrpyed_password = decrypt(encrypted_password, input_password)
             except Exception as e:
-                logger.error(f"Error during ecnryption: {str(e)}")
+                logger.error(f"Error during decryption: {str(e)}")
                 return Response({'error': 'Invalid email or password'}, status=status.HTTP_401_UNAUTHORIZED)
             
             if decrpyed_password == input_password:
